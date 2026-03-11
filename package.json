@@ -1,6 +1,6 @@
 {
   "name": "hound-mcp",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "The dependency bloodhound for AI coding agents. Sniffs out vulnerabilities, license risks, and health issues in your dependencies — free, no API keys.",
   "keywords": [
     "mcp",
@@ -18,7 +18,7 @@
   "homepage": "https://github.com/tiluckdave/hound-mcp",
   "repository": {
     "type": "git",
-    "url": "https://github.com/tiluckdave/hound-mcp.git"
+    "url": "git+https://github.com/tiluckdave/hound-mcp.git"
   },
   "bugs": {
     "url": "https://github.com/tiluckdave/hound-mcp/issues"
