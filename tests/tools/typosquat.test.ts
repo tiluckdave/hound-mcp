@@ -15,7 +15,7 @@ const makePackage = (name: string, versions = 5): depsdev.DepsDevPackage => ({
 });
 
 function getText(result: unknown): string {
-  return (result as { content: Array<{ text: string }> }).content[0]?.text ?? "";
+  return (result as { content: { text: string }[] }).content[0]?.text ?? "";
 }
 
 describe("hound_typosquat", () => {
@@ -36,7 +36,7 @@ describe("hound_typosquat", () => {
       throw new Error("Not found");
     });
 
-    const result = await tool.handler({ name: "lodash", ecosystem: "npm" });
+    const result = await (tool.handler as (args: Record<string, unknown>, extra?: unknown) => Promise<unknown>)({ name: "lodash", ecosystem: "npm" });
     const text = getText(result);
     expect(text).toContain("lodash");
     expect(text).toContain("No typosquat variants found");
@@ -49,7 +49,7 @@ describe("hound_typosquat", () => {
       throw new Error("Not found");
     });
 
-    const result = await tool.handler({ name: "lodash", ecosystem: "npm" });
+    const result = await (tool.handler as (args: Record<string, unknown>, extra?: unknown) => Promise<unknown>)({ name: "lodash", ecosystem: "npm" });
     const text = getText(result);
     expect(text).toContain("lodas");
     expect(text).toContain("5 versions");
@@ -58,7 +58,7 @@ describe("hound_typosquat", () => {
   it("warns when target package doesn't exist", async () => {
     vi.mocked(depsdev.getPackage).mockRejectedValue(new Error("Not found"));
 
-    const result = await tool.handler({ name: "myfakepackage", ecosystem: "npm" });
+    const result = await (tool.handler as (args: Record<string, unknown>, extra?: unknown) => Promise<unknown>)({ name: "myfakepackage", ecosystem: "npm" });
     const text = getText(result);
     expect(text).toContain("does not exist");
   });

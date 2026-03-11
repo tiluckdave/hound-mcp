@@ -42,7 +42,9 @@ pnpm test:watch   # watch mode
 ```bash
 pnpm lint         # check
 pnpm lint:fix     # auto-fix
+pnpm format       # prettier
 pnpm typecheck    # TypeScript check
+pnpm check        # run everything (typecheck + lint + test)
 ```
 
 ---
@@ -52,51 +54,46 @@ pnpm typecheck    # TypeScript check
 ```sh
 src/
 ├── index.ts          # Entry point (stdio transport)
-├── server.ts         # MCP server + tool registration
+├── server.ts         # MCP server + tool & prompt registration
 ├── tools/            # One file per MCP tool
-├── parsers/          # One file per lockfile format
+├── prompts/          # Built-in MCP prompts
 ├── api/              # External API clients (deps.dev, OSV)
-├── scoring/          # Risk scoring algorithm
 └── types/            # Shared TypeScript types
 tests/
-└── ...               # Mirror src/ structure
+├── api/              # Unit tests for API clients
+└── tools/            # Unit tests for tools
 ```
+
+---
 
 ## Adding a New Tool
 
-1. Create `src/tools/your-tool.ts`
-2. Export a `register` function that takes the MCP server instance
-3. Import and call it in `src/server.ts`
-4. Add a test in `tests/tools/your-tool.test.ts`
+1. Create `src/tools/your-tool.ts`:
 
 ```typescript
-// src/tools/your-tool.ts
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { z } from "zod";
+import { z } from "zod/v4";
 
-export function register(server: McpServer): void {
-  server.tool(
+export function register(server: McpServer) {
+  return server.registerTool(
     "hound_your_tool",
-    "Description of what this tool does",
     {
-      packageName: z.string().describe("The package name"),
+      description: "What this tool does in one sentence.",
+      inputSchema: {
+        name: z.string().describe("The package name"),
+      },
     },
-    async ({ packageName }) => {
-      // implementation
+    async ({ name }) => {
       return {
-        content: [{ type: "text", text: `Result for ${packageName}` }],
+        content: [{ type: "text", text: `Result for ${name}` }],
       };
     },
   );
 }
 ```
 
-## Adding a New Lockfile Parser
-
-1. Create `src/parsers/your-format.ts`
-2. Export a `parse(content: string): ParsedDependency[]` function
-3. Add tests in `tests/parsers/your-format.test.ts`
-4. Register it in `src/tools/audit.ts`
+1. Import and call `register(server)` in `src/server.ts`
+1. Add tests in `tests/tools/your-tool.test.ts`
 
 ---
 
@@ -105,18 +102,19 @@ export function register(server: McpServer): void {
 - TypeScript strict mode — no `any`, ever
 - All tool outputs are **human-readable formatted text**, not JSON blobs
 - All API calls go through `src/api/` clients — never call `fetch` directly in tools
-- Use Zod for all input validation
-- Error messages must be user-friendly — no raw stack traces to the AI agent
+- Import Zod as `import { z } from "zod/v4"` (not `"zod"`)
+- Use `server.registerTool()` — `server.tool()` is deprecated
+- Error messages must be user-friendly — no raw stack traces
 
 ---
 
 ## Submitting a PR
 
 1. Fork the repo
-2. Create a branch: `git checkout -b feat/your-feature`
-3. Make your changes
-4. Run `pnpm check` (typecheck + lint + tests must pass)
-5. Open a PR with a clear description of what and why
+1. Create a branch: `git checkout -b feat/your-feature`
+1. Make your changes
+1. Run `pnpm check` — typecheck + lint + tests must all pass
+1. Open a PR with a clear description of what and why
 
 ### PR checklist
 

@@ -37,11 +37,11 @@ export interface OsvSeverityEntry {
 
 export interface OsvRange {
   type: "SEMVER" | "ECOSYSTEM" | "GIT";
-  events: Array<
+  events: (
     | { introduced: string; fixed?: undefined; last_affected?: undefined }
     | { fixed: string; introduced?: undefined; last_affected?: undefined }
     | { last_affected: string; introduced?: undefined; fixed?: undefined }
-  >;
+  )[];
 }
 
 export interface OsvAffected {
@@ -70,7 +70,7 @@ export interface OsvVuln {
   aliases?: string[];
   modified: string;
   published: string;
-  references?: Array<{ type: string; url: string }>;
+  references?: { type: string; url: string }[];
   affected: OsvAffected[];
   severity?: OsvSeverityEntry[];
   database_specific?: OsvDatabaseSpecific;
@@ -89,7 +89,7 @@ export interface OsvBatchResponse {
 // HTTP helpers
 // ---------------------------------------------------------------------------
 
-async function post<TBody, TResponse>(path: string, body: TBody): Promise<TResponse> {
+async function post<TResponse>(path: string, body: unknown): Promise<TResponse> {
   const url = `${BASE_URL}${path}`;
   const res = await fetch(url, {
     method: "POST",
@@ -132,7 +132,7 @@ export async function queryVulns(
   name: string,
   version: string,
 ): Promise<OsvVuln[]> {
-  const response = await post<unknown, OsvQueryResponse>("/query", {
+  const response = await post<OsvQueryResponse>("/query", {
     version,
     package: {
       name,
@@ -148,11 +148,11 @@ export async function queryVulns(
  * Packages with no vulnerabilities return an empty array.
  */
 export async function queryVulnsBatch(
-  packages: Array<{ ecosystem: Ecosystem; name: string; version: string }>,
+  packages: { ecosystem: Ecosystem; name: string; version: string }[],
 ): Promise<OsvVuln[][]> {
   if (packages.length === 0) return [];
 
-  const response = await post<unknown, OsvBatchResponse>("/querybatch", {
+  const response = await post<OsvBatchResponse>("/querybatch", {
     queries: packages.map((pkg) => ({
       version: pkg.version,
       package: {

@@ -28,7 +28,7 @@ const VULN_FIXTURE: OsvVuln = {
 };
 
 function getText(result: unknown): string {
-  return (result as { content: Array<{ text: string }> }).content[0]?.text ?? "";
+  return (result as { content: { text: string }[] }).content[0]?.text ?? "";
 }
 
 describe("hound_popular", () => {
@@ -47,7 +47,7 @@ describe("hound_popular", () => {
     vi.mocked(depsdev.getPackage).mockImplementation(async (_, name) => makePackage(name));
     vi.mocked(osv.queryVulnsBatch).mockResolvedValue([[], []]);
 
-    const result = await tool.handler({
+    const result = await (tool.handler as (args: Record<string, unknown>, extra?: unknown) => Promise<unknown>)({
       ecosystem: "npm",
       packages: ["express", "lodash"],
     });
@@ -61,7 +61,7 @@ describe("hound_popular", () => {
     vi.mocked(depsdev.getPackage).mockImplementation(async (_, name) => makePackage(name));
     vi.mocked(osv.queryVulnsBatch).mockResolvedValue([[VULN_FIXTURE], []]);
 
-    const result = await tool.handler({
+    const result = await (tool.handler as (args: Record<string, unknown>, extra?: unknown) => Promise<unknown>)({
       ecosystem: "npm",
       packages: ["express", "lodash"],
     });
@@ -75,7 +75,7 @@ describe("hound_popular", () => {
     vi.mocked(depsdev.getPackage).mockImplementation(async (_, name) => makePackage(name));
     vi.mocked(osv.queryVulnsBatch).mockResolvedValue(Array.from({ length: 10 }, () => []));
 
-    const result = await tool.handler({ ecosystem: "npm" });
+    const result = await (tool.handler as (args: Record<string, unknown>, extra?: unknown) => Promise<unknown>)({ ecosystem: "npm" });
     const text = getText(result);
     expect(text).toContain("npm popular packages");
     expect(text).toContain("express@1.0.0");
@@ -88,7 +88,7 @@ describe("hound_popular", () => {
     });
     vi.mocked(osv.queryVulnsBatch).mockResolvedValue([[]]);
 
-    const result = await tool.handler({
+    const result = await (tool.handler as (args: Record<string, unknown>, extra?: unknown) => Promise<unknown>)({
       ecosystem: "npm",
       packages: ["express", "badpkg"],
     });

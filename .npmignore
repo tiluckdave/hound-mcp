@@ -6,7 +6,8 @@ tests/
 tsconfig.json
 tsup.config.ts
 vitest.config.ts
-biome.json
+eslint.config.js
+.prettierrc.json
 .gitignore
 
 # Docs (README and LICENSE are published via package.json "files")

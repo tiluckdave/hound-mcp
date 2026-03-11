@@ -1,28 +1,31 @@
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { z } from "zod";
+import { z } from "zod/v4";
 import { getDependencies } from "../api/depsdev.js";
 import type { Ecosystem } from "../types/index.js";
 
 const ECOSYSTEM_VALUES = ["npm", "pypi", "go", "maven", "cargo", "nuget", "rubygems"] as const;
 
 export function register(server: McpServer) {
-  return server.tool(
+  return server.registerTool(
     "hound_tree",
-    "Show the full resolved dependency tree for a package version, including all transitive dependencies with their depth and relation type.",
     {
-      name: z.string().describe("Package name"),
-      version: z.string().describe("Package version"),
-      ecosystem: z
-        .enum(ECOSYSTEM_VALUES)
-        .default("npm")
-        .describe("Package ecosystem (default: npm)"),
-      maxDepth: z
-        .number()
-        .int()
-        .min(1)
-        .max(10)
-        .default(3)
-        .describe("Maximum depth to display (default: 3, max: 10)"),
+      description:
+        "Show the full resolved dependency tree for a package version, including all transitive dependencies with their depth and relation type.",
+      inputSchema: {
+        name: z.string().describe("Package name"),
+        version: z.string().describe("Package version"),
+        ecosystem: z
+          .enum(ECOSYSTEM_VALUES)
+          .default("npm")
+          .describe("Package ecosystem (default: npm)"),
+        maxDepth: z
+          .number()
+          .int()
+          .min(1)
+          .max(10)
+          .default(3)
+          .describe("Maximum depth to display (default: 3, max: 10)"),
+      },
     },
     async ({ name, version, ecosystem, maxDepth }) => {
       let deps: Awaited<ReturnType<typeof getDependencies>>;
@@ -83,7 +86,7 @@ export function register(server: McpServer) {
 
 function renderNode(
   lines: string[],
-  nodes: Array<{ key: { name: string; version: string }; relationType: string; errors: string[] }>,
+  nodes: { key: { name: string; version: string }; relationType: string; errors: string[] }[],
   children: Map<number, number[]>,
   nodeIndex: number,
   depth: number,

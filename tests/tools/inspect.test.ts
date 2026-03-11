@@ -48,7 +48,7 @@ const PROJECT_FIXTURE: depsdev.DepsDevProject = {
 };
 
 function getText(result: unknown): string {
-  return (result as { content: Array<{ text: string }> }).content[0]?.text ?? "";
+  return (result as { content: { text: string }[] }).content[0]?.text ?? "";
 }
 
 describe("hound_inspect", () => {
@@ -68,7 +68,7 @@ describe("hound_inspect", () => {
     vi.mocked(osv.queryVulns).mockResolvedValue([]);
     vi.mocked(depsdev.extractProjectId).mockReturnValue(null);
 
-    const result = await tool.handler({ name: "express", version: "4.18.2", ecosystem: "npm" });
+    const result = await (tool.handler as (args: Record<string, unknown>, extra?: unknown) => Promise<unknown>)({ name: "express", version: "4.18.2", ecosystem: "npm" });
     const text = getText(result);
     expect(text).toContain("express@4.18.2");
     expect(text).toContain("MIT");
@@ -88,7 +88,7 @@ describe("hound_inspect", () => {
     vi.mocked(osv.extractSeverity).mockReturnValue("MODERATE");
     vi.mocked(depsdev.extractProjectId).mockReturnValue(null);
 
-    const result = await tool.handler({ name: "express", version: "4.18.2", ecosystem: "npm" });
+    const result = await (tool.handler as (args: Record<string, unknown>, extra?: unknown) => Promise<unknown>)({ name: "express", version: "4.18.2", ecosystem: "npm" });
     const text = getText(result);
     expect(text).toContain("1");
     expect(text).toContain("moderate");
@@ -100,7 +100,7 @@ describe("hound_inspect", () => {
     vi.mocked(depsdev.extractProjectId).mockReturnValue("github.com/expressjs/express");
     vi.mocked(depsdev.getProject).mockResolvedValue(PROJECT_FIXTURE);
 
-    const result = await tool.handler({ name: "express", version: "4.18.2", ecosystem: "npm" });
+    const result = await (tool.handler as (args: Record<string, unknown>, extra?: unknown) => Promise<unknown>)({ name: "express", version: "4.18.2", ecosystem: "npm" });
     const text = getText(result);
     expect(text).toContain("62,000");
     expect(text).toContain("7.5/10");
@@ -111,7 +111,7 @@ describe("hound_inspect", () => {
     vi.mocked(depsdev.getVersion).mockRejectedValue(new Error("Not found"));
     vi.mocked(osv.queryVulns).mockResolvedValue([]);
 
-    const result = await tool.handler({ name: "nonexistent", version: "1.0.0", ecosystem: "npm" });
+    const result = await (tool.handler as (args: Record<string, unknown>, extra?: unknown) => Promise<unknown>)({ name: "nonexistent", version: "1.0.0", ecosystem: "npm" });
     const text = getText(result);
     expect(text).toContain("Could not find");
   });

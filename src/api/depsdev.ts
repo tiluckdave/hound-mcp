@@ -64,11 +64,11 @@ export interface DepsDevVersion {
 
 export interface DepsDevPackage {
   packageKey: { system: string; name: string };
-  versions: Array<{
+  versions: {
     versionKey: DepsDevVersionKey;
     publishedAt: string;
     isDefault: boolean;
-  }>;
+  }[];
 }
 
 export interface DepsDevDepNode {

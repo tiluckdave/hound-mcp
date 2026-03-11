@@ -1,16 +1,19 @@
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { z } from "zod";
+import { z } from "zod/v4";
 import { getAdvisory } from "../api/depsdev.js";
 import { getVuln } from "../api/osv.js";
 
 export function register(server: McpServer) {
-  return server.tool(
+  return server.registerTool(
     "hound_advisories",
-    "Get full details for a security advisory by ID (GHSA, CVE, or OSV ID). Returns title, severity, affected versions, fix versions, and references.",
     {
-      id: z
-        .string()
-        .describe("Advisory ID — e.g. GHSA-rv95-896h-c2vc, CVE-2024-29041, or any OSV ID"),
+      description:
+        "Get full details for a security advisory by ID (GHSA, CVE, or OSV ID). Returns title, severity, affected versions, fix versions, and references.",
+      inputSchema: {
+        id: z
+          .string()
+          .describe("Advisory ID — e.g. GHSA-rv95-896h-c2vc, CVE-2024-29041, or any OSV ID"),
+      },
     },
     async ({ id }) => {
       // Try OSV first (richer data), fall back to deps.dev advisory endpoint

@@ -1,5 +1,5 @@
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { z } from "zod";
+import { z } from "zod/v4";
 import { extractFixVersions, extractSeverity, queryVulns } from "../api/osv.js";
 import type { Ecosystem } from "../types/index.js";
 
@@ -14,16 +14,19 @@ const SEVERITY_ICON: Record<string, string> = {
 };
 
 export function register(server: McpServer) {
-  return server.tool(
+  return server.registerTool(
     "hound_vulns",
-    "List all known vulnerabilities for a specific package version, grouped by severity with fix versions and advisory links.",
     {
-      name: z.string().describe("Package name (e.g. express, lodash)"),
-      version: z.string().describe("Package version (e.g. 4.18.2)"),
-      ecosystem: z
-        .enum(ECOSYSTEM_VALUES)
-        .default("npm")
-        .describe("Package ecosystem (default: npm)"),
+      description:
+        "List all known vulnerabilities for a specific package version, grouped by severity with fix versions and advisory links.",
+      inputSchema: {
+        name: z.string().describe("Package name (e.g. express, lodash)"),
+        version: z.string().describe("Package version (e.g. 4.18.2)"),
+        ecosystem: z
+          .enum(ECOSYSTEM_VALUES)
+          .default("npm")
+          .describe("Package ecosystem (default: npm)"),
+      },
     },
     async ({ name, version, ecosystem }) => {
       let vulns: Awaited<ReturnType<typeof queryVulns>>;
@@ -66,7 +69,7 @@ export function register(server: McpServer) {
 
       const lines: string[] = [
         `🔍 Vulnerabilities in ${name}@${version} (${ecosystem})`,
-        `${"─".repeat(50)}`,
+        "─".repeat(50),
         `Found ${vulns.length} vulnerability${vulns.length === 1 ? "" : "ies"}`,
         "",
       ];

@@ -33,7 +33,7 @@ const DEPS_FIXTURE: depsdev.DepsDevDependencies = {
 };
 
 function getText(result: unknown): string {
-  return (result as { content: Array<{ text: string }> }).content[0]?.text ?? "";
+  return (result as { content: { text: string }[] }).content[0]?.text ?? "";
 }
 
 describe("hound_tree", () => {
@@ -51,7 +51,7 @@ describe("hound_tree", () => {
   it("renders the dependency tree", async () => {
     vi.mocked(depsdev.getDependencies).mockResolvedValue(DEPS_FIXTURE);
 
-    const result = await tool.handler({
+    const result = await (tool.handler as (args: Record<string, unknown>, extra?: unknown) => Promise<unknown>)({
       name: "express",
       version: "4.18.2",
       ecosystem: "npm",
@@ -66,7 +66,7 @@ describe("hound_tree", () => {
   it("shows dependency counts in header", async () => {
     vi.mocked(depsdev.getDependencies).mockResolvedValue(DEPS_FIXTURE);
 
-    const result = await tool.handler({
+    const result = await (tool.handler as (args: Record<string, unknown>, extra?: unknown) => Promise<unknown>)({
       name: "express",
       version: "4.18.2",
       ecosystem: "npm",
@@ -81,7 +81,7 @@ describe("hound_tree", () => {
   it("respects maxDepth limit", async () => {
     vi.mocked(depsdev.getDependencies).mockResolvedValue(DEPS_FIXTURE);
 
-    const result = await tool.handler({
+    const result = await (tool.handler as (args: Record<string, unknown>, extra?: unknown) => Promise<unknown>)({
       name: "express",
       version: "4.18.2",
       ecosystem: "npm",
@@ -96,7 +96,7 @@ describe("hound_tree", () => {
   it("returns error when package not found", async () => {
     vi.mocked(depsdev.getDependencies).mockRejectedValue(new Error("Not found"));
 
-    const result = await tool.handler({
+    const result = await (tool.handler as (args: Record<string, unknown>, extra?: unknown) => Promise<unknown>)({
       name: "nonexistent",
       version: "1.0.0",
       ecosystem: "npm",

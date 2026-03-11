@@ -1,5 +1,5 @@
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { z } from "zod";
+import { z } from "zod/v4";
 import { getPackage } from "../api/depsdev.js";
 import type { Ecosystem } from "../types/index.js";
 
@@ -24,7 +24,9 @@ function generateTypos(name: string): string[] {
 
   // Transpose adjacent characters
   for (let i = 0; i < name.length - 1; i++) {
-    variants.add(name.slice(0, i) + name[i + 1] + name[i] + name.slice(i + 2));
+    const a = name.charAt(i);
+    const b = name.charAt(i + 1);
+    variants.add(name.slice(0, i) + b + a + name.slice(i + 2));
   }
 
   // Hyphen/underscore confusion
@@ -50,15 +52,18 @@ function generateTypos(name: string): string[] {
 }
 
 export function register(server: McpServer) {
-  return server.tool(
+  return server.registerTool(
     "hound_typosquat",
-    "Check if a package name looks like a typosquat of a popular package. Generates likely typo variants and checks which ones exist in the registry.",
     {
-      name: z.string().describe("Package name to check"),
-      ecosystem: z
-        .enum(ECOSYSTEM_VALUES)
-        .default("npm")
-        .describe("Package ecosystem (default: npm)"),
+      description:
+        "Check if a package name looks like a typosquat of a popular package. Generates likely typo variants and checks which ones exist in the registry.",
+      inputSchema: {
+        name: z.string().describe("Package name to check"),
+        ecosystem: z
+          .enum(ECOSYSTEM_VALUES)
+          .default("npm")
+          .describe("Package ecosystem (default: npm)"),
+      },
     },
     async ({ name, ecosystem }) => {
       const eco = ecosystem as Ecosystem;

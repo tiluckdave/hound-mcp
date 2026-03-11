@@ -1,5 +1,5 @@
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { z } from "zod";
+import { z } from "zod/v4";
 import { extractProjectId, getProject, getVersion } from "../api/depsdev.js";
 import { extractSeverity, queryVulns } from "../api/osv.js";
 import type { Ecosystem } from "../types/index.js";
@@ -7,16 +7,19 @@ import type { Ecosystem } from "../types/index.js";
 const ECOSYSTEM_VALUES = ["npm", "pypi", "go", "maven", "cargo", "nuget", "rubygems"] as const;
 
 export function register(server: McpServer) {
-  return server.tool(
+  return server.registerTool(
     "hound_inspect",
-    "Get a comprehensive profile of a package version: licenses, vulnerabilities, OpenSSF scorecard, GitHub stats, and dependency count — all in one call.",
     {
-      name: z.string().describe("Package name"),
-      version: z.string().describe("Package version"),
-      ecosystem: z
-        .enum(ECOSYSTEM_VALUES)
-        .default("npm")
-        .describe("Package ecosystem (default: npm)"),
+      description:
+        "Get a comprehensive profile of a package version: licenses, vulnerabilities, OpenSSF scorecard, GitHub stats, and dependency count — all in one call.",
+      inputSchema: {
+        name: z.string().describe("Package name"),
+        version: z.string().describe("Package version"),
+        ecosystem: z
+          .enum(ECOSYSTEM_VALUES)
+          .default("npm")
+          .describe("Package ecosystem (default: npm)"),
+      },
     },
     async ({ name, version, ecosystem }) => {
       const eco = ecosystem as Ecosystem;

@@ -1,4 +1,5 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import { registerPrompts } from "./prompts/index.js";
 import { register as registerAdvisories } from "./tools/advisories.js";
 import { register as registerInspect } from "./tools/inspect.js";
 import { register as registerPopular } from "./tools/popular.js";
@@ -21,6 +22,7 @@ export function createServer(): McpServer {
   registerTyposquat(server);
   registerAdvisories(server);
   registerPopular(server);
+  registerPrompts(server);
 
   return server;
 }

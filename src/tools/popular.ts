@@ -1,5 +1,5 @@
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { z } from "zod";
+import { z } from "zod/v4";
 import { getPackage } from "../api/depsdev.js";
 import { queryVulnsBatch } from "../api/osv.js";
 import type { Ecosystem } from "../types/index.js";
@@ -61,20 +61,23 @@ const POPULAR_DEFAULTS: Record<string, string[]> = {
 };
 
 export function register(server: McpServer) {
-  return server.tool(
+  return server.registerTool(
     "hound_popular",
-    "Scan a list of popular (or user-specified) packages for known vulnerabilities. Quickly surface which widely-used packages in an ecosystem have open security issues.",
     {
-      ecosystem: z
-        .enum(ECOSYSTEM_VALUES)
-        .default("npm")
-        .describe("Package ecosystem (default: npm)"),
-      packages: z
-        .array(z.string())
-        .optional()
-        .describe(
-          "Specific package names to check. If omitted, uses a curated list of popular packages for the ecosystem.",
-        ),
+      description:
+        "Scan a list of popular (or user-specified) packages for known vulnerabilities. Quickly surface which widely-used packages in an ecosystem have open security issues.",
+      inputSchema: {
+        ecosystem: z
+          .enum(ECOSYSTEM_VALUES)
+          .default("npm")
+          .describe("Package ecosystem (default: npm)"),
+        packages: z
+          .array(z.string())
+          .optional()
+          .describe(
+            "Specific package names to check. If omitted, uses a curated list of popular packages for the ecosystem.",
+          ),
+      },
     },
     async ({ ecosystem, packages }) => {
       const eco = ecosystem as Ecosystem;
