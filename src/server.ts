@@ -1,4 +1,10 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import { register as registerAdvisories } from "./tools/advisories.js";
+import { register as registerInspect } from "./tools/inspect.js";
+import { register as registerPopular } from "./tools/popular.js";
+import { register as registerTree } from "./tools/tree.js";
+import { register as registerTyposquat } from "./tools/typosquat.js";
+import { register as registerVulns } from "./tools/vulns.js";
 
 const SERVER_NAME = "hound-mcp";
 const SERVER_VERSION = "0.1.0";
@@ -9,12 +15,12 @@ export function createServer(): McpServer {
     version: SERVER_VERSION,
   });
 
-  // Tools are registered here as they are implemented.
-  // Each tool module exports a `register(server)` function.
-  // Example (uncomment as tools are added):
-  //
-  // import { register as registerInspect } from "./tools/inspect.js";
-  // registerInspect(server);
+  registerVulns(server);
+  registerInspect(server);
+  registerTree(server);
+  registerTyposquat(server);
+  registerAdvisories(server);
+  registerPopular(server);
 
   return server;
 }
