@@ -18,7 +18,7 @@ const SEVERITY_ICON: Record<string, string> = {
 
 export function register(server: McpServer) {
   return server.registerTool(
-    "hound_audit",
+    "audit",
     {
       description:
         "Scan a project's lockfile for dependency risks. Parses package-lock.json, yarn.lock, pnpm-lock.yaml, requirements.txt, Cargo.lock, or go.sum and batch-queries OSV for vulnerabilities across all dependencies.",
@@ -160,8 +160,8 @@ export function register(server: McpServer) {
 
         lines.push("");
         lines.push("─".repeat(50));
-        lines.push("💡 Run hound_upgrade <package> to find a safe version for each.");
-        lines.push("💡 Run hound_vulns <package> <version> for full advisory details.");
+        lines.push("💡 Run upgrade <package> to find a safe version for each.");
+        lines.push("💡 Run vulns <package> <version> for full advisory details.");
       }
 
       if (truncated) {

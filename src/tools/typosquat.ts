@@ -53,7 +53,7 @@ function generateTypos(name: string): string[] {
 
 export function register(server: McpServer) {
   return server.registerTool(
-    "hound_typosquat",
+    "typosquat",
     {
       description:
         "Check if a package name looks like a typosquat of a popular package. Generates likely typo variants and checks which ones exist in the registry.",

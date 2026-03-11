@@ -48,7 +48,7 @@ function gradeEmoji(grade: string): string {
 
 export function register(server: McpServer) {
   return server.registerTool(
-    "hound_score",
+    "score",
     {
       description:
         "Compute a 0-100 Hound Score for a package version combining vulnerability severity, OpenSSF Scorecard, release recency, and license risk. Returns a letter grade (A-F) with a breakdown.",

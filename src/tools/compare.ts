@@ -92,7 +92,7 @@ function winner(a: number, b: number, higherIsBetter = true): [string, string] {
 
 export function register(server: McpServer) {
   return server.registerTool(
-    "hound_compare",
+    "compare",
     {
       description:
         "Side-by-side comparison of two packages: vulnerabilities, OpenSSF Scorecard, GitHub stars, release recency, and license. Returns a recommendation.",

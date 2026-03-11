@@ -15,7 +15,7 @@ const SEVERITY_ICON: Record<string, string> = {
 
 export function register(server: McpServer) {
   return server.registerTool(
-    "hound_vulns",
+    "vulns",
     {
       description:
         "List all known vulnerabilities for a specific package version, grouped by severity with fix versions and advisory links.",
