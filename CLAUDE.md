@@ -178,6 +178,12 @@ describe("hound_your_tool", () => {
 
 ---
 
+## Workflow
+
+**All changes must go through a PR** — never push directly to `main`. Create a branch, make changes, open a PR.
+
+---
+
 ## Security Notes
 
 - API responses from deps.dev and OSV are external data — the TypeScript types are used for shape, but treat values as untrusted
