@@ -70,7 +70,7 @@ Add to your MCP config file:
 
 ## Tools
 
-Hound registers 11 tools in your MCP client.
+Hound registers 12 tools in your MCP client.
 
 ### `hound_audit` ⭐
 
@@ -152,6 +152,16 @@ Generates likely typo variants of a package name and checks which ones exist in 
 ```text
 hound_typosquat(name: "lodash", ecosystem: "npm")
 ```
+
+### `hound_license_check`
+
+Scan a lockfile for license compliance. Resolves licenses for all dependencies and flags packages that violate the chosen policy.
+
+```text
+hound_license_check(lockfile_name: "package-lock.json", lockfile_content: "<contents>", policy: "permissive")
+```
+
+Policies: `permissive` (MIT/Apache/BSD only), `copyleft` (allows GPL but not AGPL), `none` (report only).
 
 ### `hound_popular`
 

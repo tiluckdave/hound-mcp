@@ -7,6 +7,7 @@ import { register as registerTree } from "./tools/tree.js";
 import { register as registerTyposquat } from "./tools/typosquat.js";
 import { register as registerAudit } from "./tools/audit.js";
 import { register as registerCompare } from "./tools/compare.js";
+import { register as registerLicenseCheck } from "./tools/license-check.js";
 import { register as registerPreinstall } from "./tools/preinstall.js";
 import { register as registerScore } from "./tools/score.js";
 import { register as registerUpgrade } from "./tools/upgrade.js";
@@ -29,6 +30,7 @@ export function createServer(): McpServer {
   registerPopular(server);
   registerAudit(server);
   registerCompare(server);
+  registerLicenseCheck(server);
   registerPreinstall(server);
   registerScore(server);
   registerUpgrade(server);
