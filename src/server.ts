@@ -5,6 +5,7 @@ import { register as registerInspect } from "./tools/inspect.js";
 import { register as registerPopular } from "./tools/popular.js";
 import { register as registerTree } from "./tools/tree.js";
 import { register as registerTyposquat } from "./tools/typosquat.js";
+import { register as registerScore } from "./tools/score.js";
 import { register as registerUpgrade } from "./tools/upgrade.js";
 import { register as registerVulns } from "./tools/vulns.js";
 
@@ -23,6 +24,7 @@ export function createServer(): McpServer {
   registerTyposquat(server);
   registerAdvisories(server);
   registerPopular(server);
+  registerScore(server);
   registerUpgrade(server);
   registerPrompts(server);
 
