@@ -2,9 +2,6 @@ import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod/v4";
 
 export function registerPrompts(server: McpServer): void {
-  // ---------------------------------------------------------------------------
-  // security_audit — full project security audit workflow
-  // ---------------------------------------------------------------------------
   server.registerPrompt(
     "security_audit",
     {
@@ -46,9 +43,6 @@ Summarize findings as:
     },
   );
 
-  // ---------------------------------------------------------------------------
-  // package_evaluation — evaluate a candidate package before adding it
-  // ---------------------------------------------------------------------------
   server.registerPrompt(
     "package_evaluation",
     {
@@ -89,9 +83,6 @@ Give me a clear **GO / NO-GO / CONDITIONAL** recommendation with reasoning. If c
     },
   );
 
-  // ---------------------------------------------------------------------------
-  // pre_release_check — dependency scan before shipping
-  // ---------------------------------------------------------------------------
   server.registerPrompt(
     "pre_release_check",
     {

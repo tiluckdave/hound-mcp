@@ -97,7 +97,6 @@ export function register(server: McpServer) {
           const grade = scorecardGrade(projectData.scorecard.overallScore);
           lines.push(`🏆 OpenSSF Scorecard: ${score}/10 (${grade})`);
 
-          // Show weakest checks
           const weak = [...projectData.scorecard.checks]
             .sort((a, b) => a.score - b.score)
             .slice(0, 3);

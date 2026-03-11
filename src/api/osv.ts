@@ -12,10 +12,6 @@ import type { Ecosystem, Severity } from "../types/index.js";
 
 const BASE_URL = "https://api.osv.dev/v1";
 
-// ---------------------------------------------------------------------------
-// Ecosystem name mapping (our lowercase → OSV convention)
-// ---------------------------------------------------------------------------
-
 const ECOSYSTEM_MAP: Record<Ecosystem, string> = {
   npm: "npm",
   pypi: "PyPI",
@@ -25,10 +21,6 @@ const ECOSYSTEM_MAP: Record<Ecosystem, string> = {
   nuget: "NuGet",
   rubygems: "RubyGems",
 };
-
-// ---------------------------------------------------------------------------
-// Raw API response types (mirrors the actual OSV API shape)
-// ---------------------------------------------------------------------------
 
 export interface OsvSeverityEntry {
   type: "CVSS_V2" | "CVSS_V3" | "CVSS_V4";
@@ -85,10 +77,6 @@ export interface OsvBatchResponse {
   results: OsvQueryResponse[];
 }
 
-// ---------------------------------------------------------------------------
-// HTTP helpers
-// ---------------------------------------------------------------------------
-
 async function post<TResponse>(path: string, body: unknown): Promise<TResponse> {
   const url = `${BASE_URL}${path}`;
   const res = await fetch(url, {
@@ -118,10 +106,6 @@ export class OsvError extends Error {
     this.name = "OsvError";
   }
 }
-
-// ---------------------------------------------------------------------------
-// Public API functions
-// ---------------------------------------------------------------------------
 
 /**
  * Query vulnerabilities for a single package@version.
@@ -181,10 +165,6 @@ export async function getVuln(vulnId: string): Promise<OsvVuln> {
 
   return res.json() as Promise<OsvVuln>;
 }
-
-// ---------------------------------------------------------------------------
-// Severity helpers
-// ---------------------------------------------------------------------------
 
 /**
  * Extract a human-readable severity level from an OSV vulnerability.
@@ -248,10 +228,6 @@ export function extractFixVersions(vuln: OsvVuln, ecosystem: Ecosystem): string[
 
   return [...fixed];
 }
-
-// ---------------------------------------------------------------------------
-// Internal helpers
-// ---------------------------------------------------------------------------
 
 function parseCvssScore(vector: string): number | null {
   // CVSS vectors look like "CVSS:3.1/AV:N/AC:L/..." — the base score is not

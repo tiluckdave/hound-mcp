@@ -13,10 +13,6 @@ import type { Ecosystem } from "../types/index.js";
 
 const BASE_URL = "https://api.deps.dev/v3";
 
-// ---------------------------------------------------------------------------
-// Ecosystem name mapping (our lowercase → deps.dev uppercase)
-// ---------------------------------------------------------------------------
-
 const ECOSYSTEM_MAP: Record<Ecosystem, string> = {
   npm: "npm",
   pypi: "pypi",
@@ -26,10 +22,6 @@ const ECOSYSTEM_MAP: Record<Ecosystem, string> = {
   nuget: "nuget",
   rubygems: "rubygems",
 };
-
-// ---------------------------------------------------------------------------
-// Raw API response types (mirrors the actual API shape)
-// ---------------------------------------------------------------------------
 
 export interface DepsDevVersionKey {
   system: string;
@@ -123,10 +115,6 @@ export interface DepsDevAdvisory {
   cvss3Vector: string;
 }
 
-// ---------------------------------------------------------------------------
-// HTTP helper
-// ---------------------------------------------------------------------------
-
 async function get<T>(path: string): Promise<T> {
   const url = `${BASE_URL}${path}`;
   const res = await fetch(url, {
@@ -151,10 +139,6 @@ export class DepsDevError extends Error {
     this.name = "DepsDevError";
   }
 }
-
-// ---------------------------------------------------------------------------
-// Public API functions
-// ---------------------------------------------------------------------------
 
 /**
  * Get metadata for a specific package version.
