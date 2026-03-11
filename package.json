@@ -1,6 +1,6 @@
 {
   "name": "hound-mcp",
-  "version": "0.1.12",
+  "version": "0.2.0",
   "description": "The dependency bloodhound for AI coding agents. Sniffs out vulnerabilities, license risks, and health issues in your dependencies — free, no API keys.",
   "keywords": [
     "mcp",

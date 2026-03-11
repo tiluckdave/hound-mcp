@@ -70,7 +70,15 @@ Add to your MCP config file:
 
 ## Tools
 
-Hound registers 6 tools in your MCP client.
+Hound registers 11 tools in your MCP client.
+
+### `hound_audit` ⭐
+
+Scan a whole project by passing your lockfile content. Parses `package-lock.json`, `yarn.lock`, `pnpm-lock.yaml`, `requirements.txt`, `Cargo.lock`, or `go.sum` and batch-queries OSV for vulnerabilities across all dependencies.
+
+```text
+hound_audit(lockfile_name: "package-lock.json", lockfile_content: "<contents>")
+```
 
 ### `hound_vulns`
 
@@ -86,6 +94,38 @@ Comprehensive package profile — licenses, vulnerabilities, OpenSSF Scorecard, 
 
 ```text
 hound_inspect(name: "lodash", version: "4.17.21", ecosystem: "npm")
+```
+
+### `hound_score`
+
+Compute a 0–100 Hound Score combining vulnerability severity (40 pts), OpenSSF Scorecard (25 pts), release recency (20 pts), and license risk (15 pts). Returns a letter grade A–F with a full breakdown.
+
+```text
+hound_score(name: "express", version: "4.18.2", ecosystem: "npm")
+```
+
+### `hound_upgrade`
+
+Find the minimum version upgrade that resolves all known vulnerabilities. Checks every published version and returns the nearest safe one.
+
+```text
+hound_upgrade(name: "lodash", version: "4.17.20", ecosystem: "npm")
+```
+
+### `hound_compare`
+
+Side-by-side comparison of two packages across vulnerabilities, OpenSSF Scorecard, GitHub stars, release recency, and license. Returns a recommendation.
+
+```text
+hound_compare(package_a: "express", package_b: "fastify", ecosystem: "npm")
+```
+
+### `hound_preinstall`
+
+Safety check before installing a package. Checks vulnerabilities, typosquatting risk, abandonment, and license. Returns a GO / CAUTION / NO-GO verdict.
+
+```text
+hound_preinstall(name: "some-package", version: "1.0.0", ecosystem: "npm")
 ```
 
 ### `hound_tree`

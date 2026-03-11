@@ -13,7 +13,7 @@ import { register as registerUpgrade } from "./tools/upgrade.js";
 import { register as registerVulns } from "./tools/vulns.js";
 
 const SERVER_NAME = "hound-mcp";
-const SERVER_VERSION = "0.1.12";
+const SERVER_VERSION = "0.2.0";
 
 export function createServer(): McpServer {
   const server = new McpServer({
