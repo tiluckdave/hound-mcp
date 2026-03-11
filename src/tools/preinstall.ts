@@ -16,7 +16,7 @@ const COPYLEFT_LICENSES = new Set([
 
 export function register(server: McpServer) {
   return server.registerTool(
-    "hound_preinstall",
+    "preinstall",
     {
       description:
         "Safety check before installing a package. Checks known vulnerabilities, typosquatting risk, abandonment, and license concerns. Returns a go/no-go verdict.",

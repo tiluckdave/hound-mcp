@@ -22,7 +22,7 @@ function compareVersions(a: string, b: string): number {
 
 export function register(server: McpServer) {
   return server.registerTool(
-    "hound_upgrade",
+    "upgrade",
     {
       description:
         "Find the minimum version upgrade that resolves all known vulnerabilities for a package. Checks every published version and returns the nearest safe one.",
