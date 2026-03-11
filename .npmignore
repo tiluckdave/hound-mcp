@@ -1,0 +1,22 @@
+# Source files (dist/ is published, not src/)
+src/
+tests/
+
+# Config files
+tsconfig.json
+tsup.config.ts
+vitest.config.ts
+biome.json
+.gitignore
+
+# Docs (README and LICENSE are published via package.json "files")
+CONTRIBUTING.md
+CLAUDE.md
+hound-mcp-final-plan.md
+hound-distribution.md
+
+# CI/CD
+.github/
+
+# Coverage
+coverage/
