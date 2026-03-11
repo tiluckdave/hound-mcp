@@ -1,0 +1,51 @@
+name: Feature Request
+description: Suggest a new tool, parser, or improvement
+labels: [enhancement]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Got an idea? We'd love to hear it. Keep in mind Hound's core constraint: **zero API keys, forever free**.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem does this solve?
+      description: What are you trying to do that Hound doesn't support today?
+      placeholder: "I want to be able to..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed solution
+      description: How would you like this to work?
+    validations:
+      required: true
+
+  - type: dropdown
+    id: type
+    attributes:
+      label: Type of request
+      options:
+        - New tool
+        - New lockfile parser
+        - Improvement to existing tool
+        - Better output formatting
+        - Performance improvement
+        - Documentation
+        - Other
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: constraints
+    attributes:
+      label: Compatibility check
+      description: Please confirm your request fits Hound's principles.
+      options:
+        - label: This does not require an API key or account
+          required: true
+        - label: This does not require a paid service
+          required: true

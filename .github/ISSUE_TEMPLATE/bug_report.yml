@@ -1,0 +1,95 @@
+name: Bug Report
+description: Something isn't working as expected
+labels: [bug, needs-triage]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report a bug. Please fill in as much detail as you can.
+
+  - type: textarea
+    id: description
+    attributes:
+      label: What happened?
+      description: A clear description of the bug.
+      placeholder: "When I run hound_audit on my project, it..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: What did you expect?
+      placeholder: "I expected it to..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to reproduce
+      description: How can we reproduce this?
+      placeholder: |
+        1. Add hound-mcp to MCP config
+        2. Run tool hound_vulns with package X@Y
+        3. See error
+    validations:
+      required: true
+
+  - type: dropdown
+    id: tool
+    attributes:
+      label: Which tool?
+      options:
+        - hound_audit
+        - hound_compare
+        - hound_preinstall
+        - hound_license_check
+        - hound_upgrade
+        - hound_score
+        - hound_inspect
+        - hound_vulns
+        - hound_tree
+        - hound_typosquat
+        - hound_advisories
+        - hound_popular
+        - Not tool-specific / general
+    validations:
+      required: true
+
+  - type: input
+    id: node-version
+    attributes:
+      label: Node.js version
+      placeholder: "e.g. 20.11.0"
+    validations:
+      required: true
+
+  - type: input
+    id: hound-version
+    attributes:
+      label: hound-mcp version
+      placeholder: "e.g. 0.1.0"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: client
+    attributes:
+      label: MCP client
+      options:
+        - Claude Desktop
+        - Cursor
+        - VS Code
+        - Claude Code (CLI)
+        - Windsurf
+        - Zed
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant logs or error output
+      render: shell
