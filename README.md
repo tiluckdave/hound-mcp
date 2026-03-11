@@ -8,6 +8,10 @@ Hound is a free, open-source MCP server that gives AI coding agents a nose for s
 [![CI](https://github.com/tiluckdave/hound-mcp/actions/workflows/ci.yml/badge.svg)](https://github.com/tiluckdave/hound-mcp/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
+<a href="https://glama.ai/mcp/servers/tiluckdave/hound-mcp">
+  <img width="380" height="200" src="https://glama.ai/mcp/servers/tiluckdave/hound-mcp/badge" alt="Hound MCP server" />
+</a>
+
 ---
 
 ## Why Hound?
