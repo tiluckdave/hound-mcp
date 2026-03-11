@@ -94,7 +94,6 @@ export function register(server: McpServer) {
         };
       }
 
-      // Fetch the default version for each package
       const packageResults = await Promise.allSettled(
         names.map(async (name) => {
           const pkg = await getPackage(eco, name);
@@ -115,7 +114,6 @@ export function register(server: McpServer) {
 
       const failed = packageResults.filter((r) => r.status === "rejected").length;
 
-      // Batch query vulns for all resolved packages
       const vulnResults = await queryVulnsBatch(
         resolved.map((p) => ({ ecosystem: eco, name: p.name, version: p.version })),
       );
