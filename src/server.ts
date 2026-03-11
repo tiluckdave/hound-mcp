@@ -5,10 +5,11 @@ import { register as registerInspect } from "./tools/inspect.js";
 import { register as registerPopular } from "./tools/popular.js";
 import { register as registerTree } from "./tools/tree.js";
 import { register as registerTyposquat } from "./tools/typosquat.js";
+import { register as registerUpgrade } from "./tools/upgrade.js";
 import { register as registerVulns } from "./tools/vulns.js";
 
 const SERVER_NAME = "hound-mcp";
-const SERVER_VERSION = "0.1.0";
+const SERVER_VERSION = "0.1.12";
 
 export function createServer(): McpServer {
   const server = new McpServer({
@@ -22,6 +23,7 @@ export function createServer(): McpServer {
   registerTyposquat(server);
   registerAdvisories(server);
   registerPopular(server);
+  registerUpgrade(server);
   registerPrompts(server);
 
   return server;
