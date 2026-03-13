@@ -46,7 +46,7 @@ const MAX_FETCH = 50;
 
 export function register(server: McpServer) {
   return server.registerTool(
-    "hound_license_check",
+    "license_check",
     {
       description:
         "Scan a lockfile for license compliance. Resolves licenses for every dependency and flags packages that violate the chosen policy (permissive, copyleft, or none).",

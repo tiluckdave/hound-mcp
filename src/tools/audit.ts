@@ -18,7 +18,7 @@ const SEVERITY_ICON: Record<string, string> = {
 
 export function register(server: McpServer) {
   return server.registerTool(
-    "hound_audit",
+    "audit",
     {
       description:
         "Scan a project's lockfile for dependency risks. Parses package-lock.json, yarn.lock, pnpm-lock.yaml, requirements.txt, Cargo.lock, or go.sum and batch-queries OSV for vulnerabilities across all dependencies.",

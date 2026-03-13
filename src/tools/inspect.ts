@@ -8,7 +8,7 @@ const ECOSYSTEM_VALUES = ["npm", "pypi", "go", "maven", "cargo", "nuget", "rubyg
 
 export function register(server: McpServer) {
   return server.registerTool(
-    "hound_inspect",
+    "inspect",
     {
       description:
         "Get a comprehensive profile of a package version: licenses, vulnerabilities, OpenSSF scorecard, GitHub stats, and dependency count — all in one call.",

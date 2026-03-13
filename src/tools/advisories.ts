@@ -5,7 +5,7 @@ import { getVuln } from "../api/osv.js";
 
 export function register(server: McpServer) {
   return server.registerTool(
-    "hound_advisories",
+    "advisories",
     {
       description:
         "Get full details for a security advisory by ID (GHSA, CVE, or OSV ID). Returns title, severity, affected versions, fix versions, and references.",

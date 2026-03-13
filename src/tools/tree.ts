@@ -7,7 +7,7 @@ const ECOSYSTEM_VALUES = ["npm", "pypi", "go", "maven", "cargo", "nuget", "rubyg
 
 export function register(server: McpServer) {
   return server.registerTool(
-    "hound_tree",
+    "tree",
     {
       description:
         "Show the full resolved dependency tree for a package version, including all transitive dependencies with their depth and relation type.",
