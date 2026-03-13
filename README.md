@@ -9,8 +9,6 @@
 
 ![Hound MCP Demo](demo/demo.gif)
 
----
-
 ## Why Hound?
 
 AI coding agents recommend and install packages without knowing if they're safe — and most security tools require accounts, API keys, or paid plans to tell you. Hound fixes that: it scans for vulnerabilities, checks licenses, audits dependency trees, and detects typosquatting across 7 ecosystems — zero config, zero API keys, zero cost.
@@ -91,8 +89,6 @@ Add to your MCP config file:
 
 **Supported ecosystems:** `npm` · `pypi` · `go` · `maven` · `cargo` · `nuget` · `rubygems`
 
----
-
 ## Built-in Prompts
 
 3 prompts you can invoke directly from your AI client. → [Full prompt reference](docs/prompts.md)
@@ -102,8 +98,6 @@ Add to your MCP config file:
 | `security_audit` | Full project security audit — vulns, licenses, typosquats |
 | `package_evaluation` | Go/no-go recommendation before adding a new dependency |
 | `pre_release_check` | Pre-ship dependency scan that flags release blockers |
-
----
 
 ## Use Cases
 
@@ -128,8 +122,6 @@ pnpm test         # run tests
 pnpm check        # typecheck + lint + test
 ```
 
----
-
 ## Roadmap
 
 - [ ] **Docker support** — run Hound as a container for CI/CD pipelines
@@ -137,8 +129,6 @@ pnpm check        # typecheck + lint + test
 - [ ] **`gradle.lockfile` parser** — Gradle (Java/Android) ecosystem support
 - [ ] **`hound_diff` tool** — compare two lockfile snapshots to surface newly introduced risks
 - [ ] **GitHub Action** — run `hound_audit` as a PR check without an AI agent
-
----
 
 ## Contributing
 
@@ -154,9 +144,7 @@ Good first issues are [labeled and ready](https://github.com/tiluckdave/hound-mc
 
 💬 Questions or ideas? [Open a Discussion](https://github.com/tiluckdave/hound-mcp/discussions)
 
-[![Glama MCP server](https://glama.ai/mcp/servers/tiluckdave/hound-mcp/badge)](https://glama.ai/mcp/servers/tiluckdave/hound-mcp)
-
----
+<a href="https://glama.ai/mcp/servers/tiluckdave/hound-mcp"><img width="120" src="https://glama.ai/mcp/servers/tiluckdave/hound-mcp/badge" alt="Glama MCP server" /></a>
 
 ## License
 
