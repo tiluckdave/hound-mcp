@@ -144,7 +144,7 @@ Good first issues are [labeled and ready](https://github.com/tiluckdave/hound-mc
 
 💬 Questions or ideas? [Open a Discussion](https://github.com/tiluckdave/hound-mcp/discussions)
 
-<a href="https://glama.ai/mcp/servers/tiluckdave/hound-mcp"><img width="120" src="https://glama.ai/mcp/servers/tiluckdave/hound-mcp/badge" alt="Glama MCP server" /></a>
+<a href="https://glama.ai/mcp/servers/tiluckdave/hound-mcp"><img width="320" src="https://glama.ai/mcp/servers/tiluckdave/hound-mcp/badge" alt="Glama MCP server" /></a>
 
 ## License
 
