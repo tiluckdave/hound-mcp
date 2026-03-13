@@ -26,9 +26,5 @@ Thumbs.db
 npm-debug.log*
 pnpm-debug.log*
 
-# Lock files (we keep pnpm-lock.yaml, ignore others)
-package-lock.json
-yarn.lock
-
 # Local planning docs
 hound-*.md

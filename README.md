@@ -2,26 +2,22 @@
 
 **The dependency bloodhound for AI coding agents.**
 
-Hound is a free, open-source MCP server that gives AI coding agents a nose for supply chain security. It scans packages for vulnerabilities, checks licenses, inspects dependency trees, and detects typosquatting — with **zero API keys, zero config, and zero cost**.
-
 [![npm version](https://img.shields.io/npm/v/hound-mcp)](https://www.npmjs.com/package/hound-mcp)
+[![npm downloads](https://img.shields.io/npm/dw/hound-mcp)](https://www.npmjs.com/package/hound-mcp)
 [![CI](https://github.com/tiluckdave/hound-mcp/actions/workflows/ci.yml/badge.svg)](https://github.com/tiluckdave/hound-mcp/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
-<a href="https://glama.ai/mcp/servers/tiluckdave/hound-mcp">
-  <img width="380" height="200" src="https://glama.ai/mcp/servers/tiluckdave/hound-mcp/badge" alt="Hound MCP server" />
-</a>
+![Hound MCP Demo](demo/demo.gif)
 
 ---
 
 ## Why Hound?
 
-Most security tools require accounts, API keys, or paid plans. Hound uses only two fully free, unauthenticated public APIs:
+AI coding agents recommend and install packages without knowing if they're safe — and most security tools require accounts, API keys, or paid plans to tell you. Hound fixes that: it scans for vulnerabilities, checks licenses, audits dependency trees, and detects typosquatting across 7 ecosystems — zero config, zero API keys, zero cost.
 
-- **[deps.dev](https://deps.dev)** (Google Open Source Insights) — package metadata, dependency trees, licenses, OpenSSF Scorecard
-- **[OSV](https://osv.dev)** (Google Open Source Vulnerabilities) — CVEs, GHSAs, fix versions
+Hound is the only security tool built specifically for AI coding agents — works across npm, PyPI, Go, Cargo, Maven, NuGet, and RubyGems, and plugs into Claude Code, Cursor, VS Code, and any MCP client out of the box.
 
-No sign-up. No config. Just install and go.
+It uses two fully free, unauthenticated public APIs: **[deps.dev](https://deps.dev)** (Google Open Source Insights) and **[OSV](https://osv.dev)** (Google Open Source Vulnerabilities).
 
 ---
 
@@ -48,12 +44,6 @@ Add to your MCP config file:
 }
 ```
 
-**Config file locations:**
-
-- Claude Desktop (macOS): `~/Library/Application Support/Claude/claude_desktop_config.json`
-- Cursor: `~/.cursor/mcp.json`
-- Windsurf: `~/.codeium/windsurf/mcp_config.json`
-
 ### VS Code (Copilot)
 
 ```json
@@ -70,192 +60,101 @@ Add to your MCP config file:
 }
 ```
 
+#### Config file locations
+
+| Client | Config path |
+| ------ | ----------- |
+| Claude Desktop (macOS) | `~/Library/Application Support/Claude/claude_desktop_config.json` |
+| Cursor | `~/.cursor/mcp.json` |
+| Windsurf | `~/.codeium/windsurf/mcp_config.json` |
+
 ---
 
 ## Tools
 
-Hound registers 12 tools in your MCP client.
+12 tools → [Full reference with example outputs](docs/tools.md)
 
-### `hound_audit` ⭐
+| Tool | What it does |
+| ---- | ------------ |
+| `hound_audit` ⭐ | Scan an entire lockfile for vulnerabilities across all dependencies |
+| `hound_score` | 0–100 Hound Score (vulns + scorecard + recency + license) with letter grade |
+| `hound_compare` | Side-by-side comparison of two packages with a recommendation |
+| `hound_preinstall` | GO / CAUTION / NO-GO verdict before installing a package |
+| `hound_upgrade` | Find the minimum safe version upgrade that resolves all known vulns |
+| `hound_license_check` | Scan a lockfile for license compliance against a policy |
+| `hound_vulns` | All known vulnerabilities for a package version, grouped by severity |
+| `hound_inspect` | Full package profile — license, vulns, scorecard, stars, dep count |
+| `hound_tree` | Full resolved dependency tree with transitive deps |
+| `hound_typosquat` | Detect typosquatting variants of a package name |
+| `hound_advisories` | Full advisory details by GHSA, CVE, or OSV ID |
+| `hound_popular` | Scan popular packages for known vulnerabilities |
 
-Scan a whole project by passing your lockfile content. Parses `package-lock.json`, `yarn.lock`, `pnpm-lock.yaml`, `requirements.txt`, `Cargo.lock`, or `go.sum` and batch-queries OSV for vulnerabilities across all dependencies.
-
-```text
-hound_audit(lockfile_name: "package-lock.json", lockfile_content: "<contents>")
-```
-
-### `hound_vulns`
-
-List all known vulnerabilities for a package version, grouped by severity with fix versions.
-
-```text
-hound_vulns(name: "express", version: "4.18.2", ecosystem: "npm")
-```
-
-### `hound_inspect`
-
-Comprehensive package profile — licenses, vulnerabilities, OpenSSF Scorecard, GitHub stars, and dependency count in one call.
-
-```text
-hound_inspect(name: "lodash", version: "4.17.21", ecosystem: "npm")
-```
-
-### `hound_score`
-
-Compute a 0–100 Hound Score combining vulnerability severity (40 pts), OpenSSF Scorecard (25 pts), release recency (20 pts), and license risk (15 pts). Returns a letter grade A–F with a full breakdown.
-
-```text
-hound_score(name: "express", version: "4.18.2", ecosystem: "npm")
-```
-
-### `hound_upgrade`
-
-Find the minimum version upgrade that resolves all known vulnerabilities. Checks every published version and returns the nearest safe one.
-
-```text
-hound_upgrade(name: "lodash", version: "4.17.20", ecosystem: "npm")
-```
-
-### `hound_compare`
-
-Side-by-side comparison of two packages across vulnerabilities, OpenSSF Scorecard, GitHub stars, release recency, and license. Returns a recommendation.
-
-```text
-hound_compare(package_a: "express", package_b: "fastify", ecosystem: "npm")
-```
-
-### `hound_preinstall`
-
-Safety check before installing a package. Checks vulnerabilities, typosquatting risk, abandonment, and license. Returns a GO / CAUTION / NO-GO verdict.
-
-```text
-hound_preinstall(name: "some-package", version: "1.0.0", ecosystem: "npm")
-```
-
-### `hound_tree`
-
-Full resolved dependency tree including all transitive dependencies, with depth and relation type.
-
-```text
-hound_tree(name: "next", version: "14.2.0", ecosystem: "npm", maxDepth: 3)
-```
-
-### `hound_advisories`
-
-Full advisory details by ID — works with GHSA, CVE, and OSV IDs.
-
-```text
-hound_advisories(id: "GHSA-rv95-896h-c2vc")
-hound_advisories(id: "CVE-2024-29041")
-```
-
-### `hound_typosquat`
-
-Generates likely typo variants of a package name and checks which ones exist in the registry — surfaces potential typosquatting attacks.
-
-```text
-hound_typosquat(name: "lodash", ecosystem: "npm")
-```
-
-### `hound_license_check`
-
-Scan a lockfile for license compliance. Resolves licenses for all dependencies and flags packages that violate the chosen policy.
-
-```text
-hound_license_check(lockfile_name: "package-lock.json", lockfile_content: "<contents>", policy: "permissive")
-```
-
-Policies: `permissive` (MIT/Apache/BSD only), `copyleft` (allows GPL but not AGPL), `none` (report only).
-
-### `hound_popular`
-
-Scan a list of popular (or user-specified) packages for known vulnerabilities. Great for a quick ecosystem health check.
-
-```text
-hound_popular(ecosystem: "npm")
-hound_popular(ecosystem: "pypi", packages: ["requests", "flask", "django"])
-```
-
----
-
-## Supported Ecosystems
-
-| Ecosystem    | Value      |
-| ------------ | ---------- |
-| npm          | `npm`      |
-| PyPI         | `pypi`     |
-| Go           | `go`       |
-| Maven        | `maven`    |
-| Cargo (Rust) | `cargo`    |
-| NuGet (.NET) | `nuget`    |
-| RubyGems     | `rubygems` |
+**Supported ecosystems:** `npm` · `pypi` · `go` · `maven` · `cargo` · `nuget` · `rubygems`
 
 ---
 
 ## Built-in Prompts
 
-Hound ships with 3 MCP prompts you can invoke directly from your AI client.
+3 prompts you can invoke directly from your AI client. → [Full prompt reference](docs/prompts.md)
 
-### `security_audit`
+| Prompt | What it does |
+| ------ | ------------ |
+| `security_audit` | Full project security audit — vulns, licenses, typosquats |
+| `package_evaluation` | Go/no-go recommendation before adding a new dependency |
+| `pre_release_check` | Pre-ship dependency scan that flags release blockers |
 
-Full project security audit — scans for vulnerabilities, license issues, and typosquat risks.
+---
 
-```text
-/security_audit ecosystem="npm"
-```
+## Use Cases
 
-### `package_evaluation`
+→ [See full examples with real lockfiles and expected output](examples/)
 
-Go/no-go recommendation before adding a new dependency.
-
-```text
-/package_evaluation package="axios" version="1.6.0" ecosystem="npm"
-```
-
-### `pre_release_check`
-
-Pre-ship dependency scan that flags release blockers.
-
-```text
-/pre_release_check version="1.2.0"
-```
+- **Before merging a PR** — scan the lockfile diff to catch newly introduced vulnerabilities before they land in main
+- **Auditing an inherited codebase** — run `hound_audit` on an existing lockfile to get a full report in seconds
+- **Checking a package before adding it** — use `hound_preinstall` to get a GO / CAUTION / NO-GO verdict
+- **License compliance** — run `hound_license_check` to ensure no GPL or AGPL packages sneak into a commercial project
+- **CI security gate** — ask your AI agent to run a security audit as part of every release check
 
 ---
 
 ## Local Development
 
 ```bash
-# Clone
 git clone https://github.com/tiluckdave/hound-mcp.git
 cd hound-mcp
-
-# Install
 pnpm install
-
-# Build
 pnpm build
-
-# Test
-pnpm test
-
-# Lint
-pnpm lint
-
-# Format
-pnpm format
-
-# Run all checks (typecheck + lint + test)
-pnpm check
-
-# Run locally as MCP server
-node dist/index.js
+pnpm test         # run tests
+pnpm check        # typecheck + lint + test
 ```
+
+---
+
+## Roadmap
+
+- [ ] **Docker support** — run Hound as a container for CI/CD pipelines
+- [ ] **`bun.lockb` parser** — Bun lockfile support
+- [ ] **`gradle.lockfile` parser** — Gradle (Java/Android) ecosystem support
+- [ ] **`hound_diff` tool** — compare two lockfile snapshots to surface newly introduced risks
+- [ ] **GitHub Action** — run `hound_audit` as a PR check without an AI agent
 
 ---
 
 ## Contributing
 
-Contributions are welcome. Read [CONTRIBUTING.md](CONTRIBUTING.md) first — the one rule is **zero API keys, forever**. Hound must always work without any account or authentication.
+Contributions are welcome. Read [CONTRIBUTING.md](CONTRIBUTING.md) to get started.
+
+The one rule: **Hound must stay zero-config and free forever.** Don't add features that require API keys or accounts.
+
+Good first issues are [labeled and ready](https://github.com/tiluckdave/hound-mcp/issues?q=is%3Aopen+label%3A%22good+first+issue%22).
+
+---
+
+## Community
+
+💬 Questions or ideas? [Open a Discussion](https://github.com/tiluckdave/hound-mcp/discussions)
+
+[![Glama MCP server](https://glama.ai/mcp/servers/tiluckdave/hound-mcp/badge)](https://glama.ai/mcp/servers/tiluckdave/hound-mcp)
 
 ---
 
