@@ -45,8 +45,8 @@ export function register(server: McpServer) {
       const nodes = deps.nodes;
       const edges = deps.edges;
 
-      const directCount = nodes.filter((n) => n.relationType === "DIRECT").length;
-      const indirectCount = nodes.filter((n) => n.relationType === "INDIRECT").length;
+      const directCount = nodes.filter((n) => n.relation === "DIRECT").length;
+      const indirectCount = nodes.filter((n) => n.relation === "INDIRECT").length;
       const totalCount = directCount + indirectCount;
 
       // Build adjacency: nodeIndex → children nodeIndexes
@@ -86,7 +86,7 @@ export function register(server: McpServer) {
 
 function renderNode(
   lines: string[],
-  nodes: { key: { name: string; version: string }; relationType: string; errors: string[] }[],
+  nodes: { versionKey: { name: string; version: string }; relation: string; errors: string[] }[],
   children: Map<number, number[]>,
   nodeIndex: number,
   depth: number,
@@ -103,7 +103,7 @@ function renderNode(
   const isRoot = depth === 0;
   const prefix = isRoot ? "" : "├── ";
   const errorSuffix = node.errors.length > 0 ? " ⚠️" : "";
-  lines.push(`${indent}${prefix}${node.key.name}@${node.key.version}${errorSuffix}`);
+  lines.push(`${indent}${prefix}${node.versionKey.name}@${node.versionKey.version}${errorSuffix}`);
 
   if (depth >= maxDepth) {
     const childCount = children.get(nodeIndex)?.length ?? 0;

@@ -8,21 +8,21 @@ vi.mock("../../src/api/depsdev.js");
 const DEPS_FIXTURE: depsdev.DepsDevDependencies = {
   nodes: [
     {
-      key: { system: "NPM", name: "express", version: "4.18.2" },
+      versionKey: { system: "NPM", name: "express", version: "4.18.2" },
       bundled: false,
-      relationType: "SELF",
+      relation: "SELF",
       errors: [],
     },
     {
-      key: { system: "NPM", name: "accepts", version: "1.3.8" },
+      versionKey: { system: "NPM", name: "accepts", version: "1.3.8" },
       bundled: false,
-      relationType: "DIRECT",
+      relation: "DIRECT",
       errors: [],
     },
     {
-      key: { system: "NPM", name: "mime-types", version: "2.1.35" },
+      versionKey: { system: "NPM", name: "mime-types", version: "2.1.35" },
       bundled: false,
-      relationType: "INDIRECT",
+      relation: "INDIRECT",
       errors: [],
     },
   ],

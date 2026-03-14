@@ -64,9 +64,9 @@ export interface DepsDevPackage {
 }
 
 export interface DepsDevDepNode {
-  key: DepsDevVersionKey;
+  versionKey: DepsDevVersionKey;
   bundled: boolean;
-  relationType: "SELF" | "DIRECT" | "INDIRECT";
+  relation: "SELF" | "DIRECT" | "INDIRECT";
   errors: string[];
 }
 

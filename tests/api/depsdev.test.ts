@@ -52,21 +52,21 @@ const PACKAGE_FIXTURE = {
 const DEPENDENCIES_FIXTURE = {
   nodes: [
     {
-      key: { system: "NPM", name: "express", version: "4.18.2" },
+      versionKey: { system: "NPM", name: "express", version: "4.18.2" },
       bundled: false,
-      relationType: "SELF",
+      relation: "SELF",
       errors: [],
     },
     {
-      key: { system: "NPM", name: "accepts", version: "1.3.8" },
+      versionKey: { system: "NPM", name: "accepts", version: "1.3.8" },
       bundled: false,
-      relationType: "DIRECT",
+      relation: "DIRECT",
       errors: [],
     },
     {
-      key: { system: "NPM", name: "mime-types", version: "2.1.35" },
+      versionKey: { system: "NPM", name: "mime-types", version: "2.1.35" },
       bundled: false,
-      relationType: "INDIRECT",
+      relation: "INDIRECT",
       errors: [],
     },
   ],
@@ -205,12 +205,12 @@ describe("getDependencies", () => {
   it("correctly identifies relation types", async () => {
     mockFetch(DEPENDENCIES_FIXTURE);
     const result = await getDependencies("npm", "express", "4.18.2");
-    const selfNode = result.nodes.find((n) => n.relationType === "SELF");
-    const directNode = result.nodes.find((n) => n.relationType === "DIRECT");
-    const indirectNode = result.nodes.find((n) => n.relationType === "INDIRECT");
-    expect(selfNode?.key.name).toBe("express");
-    expect(directNode?.key.name).toBe("accepts");
-    expect(indirectNode?.key.name).toBe("mime-types");
+    const selfNode = result.nodes.find((n) => n.relation === "SELF");
+    const directNode = result.nodes.find((n) => n.relation === "DIRECT");
+    const indirectNode = result.nodes.find((n) => n.relation === "INDIRECT");
+    expect(selfNode?.versionKey.name).toBe("express");
+    expect(directNode?.versionKey.name).toBe("accepts");
+    expect(indirectNode?.versionKey.name).toBe("mime-types");
   });
 
   it("uses :dependencies suffix in URL", async () => {
