@@ -2,12 +2,12 @@ import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod/v4";
 
 export function packageEvaluationRegisterPrompt(server: McpServer): void {
-    server.registerPrompt(
-        "package_evaluation",
-        {
-            description:
+  server.registerPrompt(
+    "package_evaluation",
+    {
+        description:
                 "Evaluate a package before adding it as a dependency. Returns a go/no-go recommendation with security, license, and health analysis.",
-            argsSchema: {
+        argsSchema: {
                 package: z.string().describe("Package name to evaluate (e.g. express, requests, serde)"),
                 version: z
                     .string()
@@ -15,8 +15,8 @@ export function packageEvaluationRegisterPrompt(server: McpServer): void {
                     .describe("Specific version to evaluate. Uses latest stable if omitted."),
                 ecosystem: z.string().optional().describe("Package ecosystem. Defaults to npm if omitted."),
             },
-        },
-        ({ package: pkg, version, ecosystem }) => {
+     },
+    ({ package: pkg, version, ecosystem }) => {
             const eco = ecosystem ?? "npm";
             const versionNote = version ? `version ${version} of ` : "";
             return {
@@ -35,11 +35,11 @@ Steps:
 5. If any advisories are listed, use \`hound_advisories\` to get the details.
 
 Give me a clear **GO / NO-GO / CONDITIONAL** recommendation with reasoning. If conditional, state exactly what version or conditions would make it acceptable.`,
-                        },
-                    },
-                ],
-            };
-        },
-    );
+            },
+         },
+       ],
+     };
+   },
+ );
     
 }
