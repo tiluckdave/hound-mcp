@@ -7,7 +7,7 @@
 [![CI](https://github.com/tiluckdave/hound-mcp/actions/workflows/ci.yml/badge.svg)](https://github.com/tiluckdave/hound-mcp/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
-<video src="demo/demo.mp4" controls autoplay loop muted width="100%"></video>
+[Hound MCP Deployment Diagram](https://github.com/user-attachments/assets/5b1908b8-2bdc-41c3-b95a-bb3677e6e5c3)
 
 ## Why Hound?
 
