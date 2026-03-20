@@ -65,4 +65,4 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Test
-        run: pnpm test:coverage
+        run: ${{ matrix.node-version == '18.x' && 'pnpm test' || 'pnpm test:coverage' }}
