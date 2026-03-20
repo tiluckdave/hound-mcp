@@ -11,5 +11,5 @@ interface VersionEntry {
  * Returns undefined if the array is empty.
  */
 export function getDefaultVersion<T extends VersionEntry>(versions: T[]): T | undefined {
-  return versions.find((v) => v.isDefault) ?? versions[versions.length - 1];
+  return versions.find((v) => v.isDefault) ?? versions.at(-1);
 }

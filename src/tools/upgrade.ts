@@ -76,7 +76,7 @@ export function register(server: McpServer) {
       );
 
       const safeVersions = toCheck.filter((_, i) => (vulnResults[i]?.length ?? 0) === 0);
-      const latestVersion = candidates[candidates.length - 1] ?? version;
+      const latestVersion = candidates.at(-1) ?? version;
       const latestVulns = vulnResults[toCheck.indexOf(latestVersion)] ?? [];
 
       const lines: string[] = [
@@ -95,7 +95,7 @@ export function register(server: McpServer) {
         lines.push("  • Evaluating an alternative package via hound_compare");
       } else {
         const minimum = safeVersions[0] ?? "";
-        const latest = safeVersions[safeVersions.length - 1] ?? "";
+        const latest = safeVersions.at(-1) ?? "";
 
         lines.push(`✅ Safe upgrade available`);
         lines.push("");
@@ -105,7 +105,7 @@ export function register(server: McpServer) {
         }
         lines.push("");
 
-        if (latestVulns.length > 0 && safeVersions[safeVersions.length - 1] !== latestVersion) {
+        if (latestVulns.length > 0 && safeVersions.at(-1) !== latestVersion) {
           lines.push(`⚠️  Latest version (${latestVersion}) still has ${latestVulns.length} known vuln(s).`);
           lines.push(`   Recommended: upgrade to ${latest}`);
         } else {
