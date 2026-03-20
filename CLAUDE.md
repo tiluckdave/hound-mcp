@@ -39,10 +39,13 @@ hound-mcp/
 │   ├── api/
 │   │   ├── depsdev.ts        # deps.dev API client (package metadata, dep trees, scorecard)
 │   │   └── osv.ts            # OSV API client (vulnerabilities, batch queries)
+│   ├── utils/
+│   │   └── getDefaultVersion.ts  # Shared helper for picking default package version
 │   └── types/
 │       └── index.ts          # Shared types (Ecosystem, etc.)
 ├── tests/
 │   ├── api/                  # Unit tests for API clients
+│   ├── utils/                # Unit tests for shared utilities
 │   └── tools/                # Unit tests for tools
 ├── eslint.config.js
 ├── tsconfig.json

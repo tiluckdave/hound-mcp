@@ -3,6 +3,7 @@ import { z } from "zod/v4";
 import { extractProjectId, getPackage, getProject, getVersion } from "../api/depsdev.js";
 import { extractSeverity, queryVulns } from "../api/osv.js";
 import type { Ecosystem } from "../types/index.js";
+import { getDefaultVersion } from "../utils/getDefaultVersion.js";
 
 const ECOSYSTEM_VALUES = ["npm", "pypi", "go", "maven", "cargo", "nuget", "rubygems"] as const;
 
@@ -37,8 +38,7 @@ export function register(server: McpServer) {
       if (!resolvedVersion) {
         try {
           const pkg = await getPackage(eco, name);
-          const defaultV =
-            pkg.versions.find((v) => v.isDefault) ?? pkg.versions[pkg.versions.length - 1];
+          const defaultV = getDefaultVersion(pkg.versions);
           resolvedVersion = defaultV?.versionKey.version ?? "";
         } catch {
           return {
