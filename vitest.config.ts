@@ -1,8 +1,7 @@
-import { createRequire } from "node:module";
+import { readFileSync } from "node:fs";
 import { defineConfig } from "vitest/config";
 
-const require = createRequire(import.meta.url);
-const { version } = require("./package.json") as { version: string };
+const { version } = JSON.parse(readFileSync("./package.json", "utf-8")) as { version: string };
 
 export default defineConfig({
   define: {
