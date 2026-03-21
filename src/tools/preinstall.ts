@@ -2,17 +2,9 @@ import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod/v4";
 import { extractProjectId, getPackage, getProject, getVersion } from "../api/depsdev.js";
 import { extractSeverity, queryVulns } from "../api/osv.js";
+import { ECOSYSTEM_VALUES } from "../constants/ecosystems.js";
+import { COPYLEFT_LICENSES } from "../constants/licenses.js";
 import type { Ecosystem } from "../types/index.js";
-
-const ECOSYSTEM_VALUES = ["npm", "pypi", "go", "maven", "cargo", "nuget", "rubygems"] as const;
-
-const COPYLEFT_LICENSES = new Set([
-  "GPL-2.0", "GPL-2.0-only", "GPL-2.0-or-later",
-  "GPL-3.0", "GPL-3.0-only", "GPL-3.0-or-later",
-  "AGPL-3.0", "AGPL-3.0-only", "AGPL-3.0-or-later",
-  "LGPL-2.0", "LGPL-2.1", "LGPL-3.0",
-  "EUPL-1.1", "EUPL-1.2", "MPL-2.0", "OSL-3.0", "CDDL-1.0", "EPL-1.0", "EPL-2.0",
-]);
 
 export function register(server: McpServer) {
   return server.registerTool(
