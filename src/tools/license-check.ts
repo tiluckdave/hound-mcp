@@ -1,18 +1,9 @@
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod/v4";
 import { getVersion } from "../api/depsdev.js";
+import { COPYLEFT_LICENSES, NETWORK_COPYLEFT } from "../constants/licenses.js";
 import { parseLockfile } from "../parsers/index.js";
 import type { Ecosystem } from "../types/index.js";
-
-const COPYLEFT_LICENSES = new Set([
-  "GPL-2.0", "GPL-2.0-only", "GPL-2.0-or-later",
-  "GPL-3.0", "GPL-3.0-only", "GPL-3.0-or-later",
-  "AGPL-3.0", "AGPL-3.0-only", "AGPL-3.0-or-later",
-  "LGPL-2.0", "LGPL-2.1", "LGPL-3.0",
-  "EUPL-1.1", "EUPL-1.2", "MPL-2.0", "OSL-3.0", "CDDL-1.0", "EPL-1.0", "EPL-2.0",
-]);
-
-const NETWORK_COPYLEFT = new Set(["AGPL-3.0", "AGPL-3.0-only", "AGPL-3.0-or-later", "EUPL-1.1", "EUPL-1.2"]);
 
 // Licenses allowed under each policy
 const POLICY_ALLOWLISTS: Record<"permissive" | "copyleft", Set<string>> = {

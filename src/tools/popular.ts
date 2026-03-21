@@ -2,9 +2,8 @@ import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod/v4";
 import { getPackage } from "../api/depsdev.js";
 import { queryVulnsBatch } from "../api/osv.js";
+import { ECOSYSTEM_VALUES } from "../constants/ecosystems.js";
 import type { Ecosystem } from "../types/index.js";
-
-const ECOSYSTEM_VALUES = ["npm", "pypi", "go", "maven", "cargo", "nuget", "rubygems"] as const;
 
 /**
  * Curated list of widely-used packages per ecosystem.
