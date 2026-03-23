@@ -83,7 +83,7 @@ async function post<TResponse>(path: string, body: unknown): Promise<TResponse> 
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      "User-Agent": "hound-mcp/0.1.0",
+      "User-Agent": `hound-mcp/${__APP_VERSION__}`,
     },
     body: JSON.stringify(body),
   });
@@ -155,7 +155,7 @@ export async function queryVulnsBatch(
 export async function getVuln(vulnId: string): Promise<OsvVuln> {
   const url = `${BASE_URL}/vulns/${encodeURIComponent(vulnId)}`;
   const res = await fetch(url, {
-    headers: { "User-Agent": "hound-mcp/0.1.0" },
+    headers: { "User-Agent": `hound-mcp/${__APP_VERSION__}` },
   });
 
   if (!res.ok) {
