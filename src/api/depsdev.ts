@@ -118,7 +118,7 @@ export interface DepsDevAdvisory {
 async function get<T>(path: string): Promise<T> {
   const url = `${BASE_URL}${path}`;
   const res = await fetch(url, {
-    headers: { "User-Agent": "hound-mcp/0.1.0" },
+    headers: { "User-Agent": `hound-mcp/${__APP_VERSION__}` },
   });
 
   if (!res.ok) {

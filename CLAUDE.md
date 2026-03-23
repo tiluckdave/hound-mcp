@@ -46,6 +46,7 @@ hound-mcp/
 ├── tests/
 │   ├── api/                  # Unit tests for API clients
 │   ├── utils/                # Unit tests for shared utilities
+│   ├── parsers/              # Unit tests for lockfile parsers
 │   └── tools/                # Unit tests for tools
 ├── eslint.config.js
 ├── tsconfig.json
@@ -157,6 +158,8 @@ If a new free, unauthenticated data source is needed:
 ## Testing
 
 Tests use Vitest with `vi.mock()` to mock API modules — no real network calls in tests.
+
+Coverage thresholds are enforced in `vitest.config.ts` — `pnpm test:coverage` will fail if coverage drops below the configured minimums.
 
 Pattern for tool tests:
 
