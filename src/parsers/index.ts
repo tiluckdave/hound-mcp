@@ -1,7 +1,7 @@
 export interface ParsedDep {
   name: string;
   version: string;
-  ecosystem: "npm" | "pypi" | "cargo" | "go";
+  ecosystem: "npm" | "pypi" | "cargo" | "go" | "rubygems";
 }
 
 /**
@@ -17,6 +17,7 @@ export function parseLockfile(filename: string, content: string): ParsedDep[] | 
   if (base === "requirements.txt") return parseRequirements(content);
   if (base === "Cargo.lock") return parseCargoLock(content);
   if (base === "go.sum") return parseGoSum(content);
+  if (base === "Gemfile.lock") return parseGemfileLock(content);
 
   return null;
 }
@@ -197,6 +198,40 @@ function parseGoSum(content: string): ParsedDep[] {
       if (!seen.has(key)) {
         seen.add(key);
         deps.push({ name: match[1], version: match[2], ecosystem: "go" });
+      }
+    }
+  }
+
+  return deps;
+}
+
+// ---------------------------------------------------------------------------
+// Gemfile.lock
+// ---------------------------------------------------------------------------
+function parseGemfileLock(content: string): ParsedDep[] {
+  const deps: ParsedDep[] = [];
+  const lines = content.split("\n");
+  let inSpecs = false;
+
+  for (const line of lines) {
+    // Start of specs section
+    if (line.trim() === "specs:") {
+      inSpecs = true;
+      continue;
+    }
+
+    // End of specs section (PLATFORMS, DEPENDENCIES, etc.)
+    if (inSpecs && line.length > 0 && !line.startsWith(" ")) {
+      inSpecs = false;
+      continue;
+    }
+
+    if (inSpecs) {
+      // Match gem entries: "    rails (7.0.3.1)" or "    actioncable (= 7.0.3.1)"
+      // Gems are indented with 4 spaces, dependencies with 6+ spaces
+      const match = /^ {4}([a-z0-9_-]+)\s+\((?:=\s*)?([^\s)]+)\)/.exec(line);
+      if (match?.[1] && match[2]) {
+        deps.push({ name: match[1], version: match[2], ecosystem: "rubygems" });
       }
     }
   }

@@ -76,6 +76,33 @@ github.com/gin-gonic/gin v1.9.1/go.mod h1:def=
 github.com/stretchr/testify v1.8.4 h1:ghi=
 `;
 
+const GEMFILE_LOCK = `GEM
+  remote: https://rubygems.org/
+  specs:
+    rails (7.0.3.1)
+      actioncable (= 7.0.3.1)
+      actionmailbox (= 7.0.3.1)
+      actionmailer (= 7.0.3.1)
+    actioncable (7.0.3.1)
+      actionpack (= 7.0.3.1)
+    puma (5.6.5)
+      nio4r (~> 2.0)
+    nio4r (2.5.9)
+
+PLATFORMS
+  x86_64-darwin-20
+
+DEPENDENCIES
+  rails (~> 7.0.3)
+  puma (~> 5.0)
+
+RUBY VERSION
+   ruby 3.1.0p0
+
+BUNDLED WITH
+   2.3.14
+`;
+
 // ---------------------------------------------------------------------------
 // parseLockfile — dispatch
 // ---------------------------------------------------------------------------
@@ -209,5 +236,82 @@ describe("go.sum", () => {
     expect(deps).toHaveLength(2);
     expect(deps).toContainEqual({ name: "github.com/gin-gonic/gin", version: "1.9.1", ecosystem: "go" });
     expect(deps).toContainEqual({ name: "github.com/stretchr/testify", version: "1.8.4", ecosystem: "go" });
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Gemfile.lock
+// ---------------------------------------------------------------------------
+
+describe("Gemfile.lock", () => {
+  it("parses gems from specs section, skipping dependencies", () => {
+    const deps = parseLockfile("Gemfile.lock", GEMFILE_LOCK);
+    expect(deps).toHaveLength(4);
+    expect(deps).toContainEqual({ name: "rails", version: "7.0.3.1", ecosystem: "rubygems" });
+    expect(deps).toContainEqual({ name: "actioncable", version: "7.0.3.1", ecosystem: "rubygems" });
+    expect(deps).toContainEqual({ name: "puma", version: "5.6.5", ecosystem: "rubygems" });
+    expect(deps).toContainEqual({ name: "nio4r", version: "2.5.9", ecosystem: "rubygems" });
+  });
+
+  it("handles gems with version constraints using = prefix", () => {
+    const content = `GEM
+  remote: https://rubygems.org/
+  specs:
+    rails (7.0.3.1)
+      actioncable (= 7.0.3.1)
+    actioncable (7.0.3.1)
+`;
+    const deps = parseLockfile("Gemfile.lock", content);
+    expect(deps).toHaveLength(2);
+    expect(deps).toContainEqual({ name: "rails", version: "7.0.3.1", ecosystem: "rubygems" });
+    expect(deps).toContainEqual({ name: "actioncable", version: "7.0.3.1", ecosystem: "rubygems" });
+  });
+
+  it("stops parsing at PLATFORMS section", () => {
+    const content = `GEM
+  remote: https://rubygems.org/
+  specs:
+    rails (7.0.3.1)
+
+PLATFORMS
+  x86_64-darwin-20
+`;
+    const deps = parseLockfile("Gemfile.lock", content);
+    expect(deps).toHaveLength(1);
+    expect(deps).toContainEqual({ name: "rails", version: "7.0.3.1", ecosystem: "rubygems" });
+  });
+
+  it("handles gems with hyphens and underscores in names", () => {
+    const content = `GEM
+  remote: https://rubygems.org/
+  specs:
+    sprockets-rails (3.4.2)
+    tzinfo-data (1.2023.3)
+    web_console (4.2.0)
+`;
+    const deps = parseLockfile("Gemfile.lock", content);
+    expect(deps).toHaveLength(3);
+    expect(deps).toContainEqual({
+      name: "sprockets-rails",
+      version: "3.4.2",
+      ecosystem: "rubygems",
+    });
+    expect(deps).toContainEqual({
+      name: "tzinfo-data",
+      version: "1.2023.3",
+      ecosystem: "rubygems",
+    });
+    expect(deps).toContainEqual({ name: "web_console", version: "4.2.0", ecosystem: "rubygems" });
+  });
+
+  it("returns empty array when no specs section exists", () => {
+    const content = `GEM
+  remote: https://rubygems.org/
+
+PLATFORMS
+  x86_64-darwin-20
+`;
+    const deps = parseLockfile("Gemfile.lock", content);
+    expect(deps).toEqual([]);
   });
 });
