@@ -314,4 +314,27 @@ PLATFORMS
     const deps = parseLockfile("Gemfile.lock", content);
     expect(deps).toEqual([]);
   });
+
+  it("ignores GIT section and only parses GEM specs", () => {
+    const content = `GIT
+  remote: https://github.com/heartcombo/devise.git
+  revision: c9e655e13253dc53e3c0981a8345f134bcda1fc5
+  branch: main
+  specs:
+    devise (5.0.2)
+      bcrypt (~> 3.0)
+
+GEM
+  remote: https://rubygems.org/
+  specs:
+    rails (7.1.5.2)
+      actionpack (= 7.1.5.2)
+    actionpack (7.1.5.2)
+`;
+    const deps = parseLockfile("Gemfile.lock", content);
+    // Should only parse GEM section, not GIT section
+    expect(deps).toHaveLength(2);
+    expect(deps).toContainEqual({ name: "rails", version: "7.1.5.2", ecosystem: "rubygems" });
+    expect(deps).toContainEqual({ name: "actionpack", version: "7.1.5.2", ecosystem: "rubygems" });
+  });
 });

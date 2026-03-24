@@ -211,11 +211,26 @@ function parseGoSum(content: string): ParsedDep[] {
 function parseGemfileLock(content: string): ParsedDep[] {
   const deps: ParsedDep[] = [];
   const lines = content.split("\n");
+  let inGemSection = false;
   let inSpecs = false;
 
   for (const line of lines) {
-    // Start of specs section
-    if (line.trim() === "specs:") {
+    // Track if we're in the GEM section (not GIT, PATH, etc.)
+    if (line.startsWith("GEM")) {
+      inGemSection = true;
+      inSpecs = false;
+      continue;
+    }
+
+    // Exit GEM section when we hit another top-level section
+    if (line.length > 0 && !line.startsWith(" ") && line !== "GEM") {
+      inGemSection = false;
+      inSpecs = false;
+      continue;
+    }
+
+    // Start of specs section (only parse if in GEM section)
+    if (inGemSection && line.trim() === "specs:") {
       inSpecs = true;
       continue;
     }
@@ -227,9 +242,10 @@ function parseGemfileLock(content: string): ParsedDep[] {
     }
 
     if (inSpecs) {
-      // Match gem entries: "    rails (7.0.3.1)" or "    actioncable (= 7.0.3.1)"
-      // Gems are indented with 4 spaces, dependencies with 6+ spaces
-      const match = /^ {4}([a-z0-9_-]+)\s+\((?:=\s*)?([^\s)]+)\)/.exec(line);
+      // Match gem spec entries: "    actioncable (7.0.3.1)"
+      // Spec entries are indented with 4 spaces
+      // Dependency lines like "      actionpack (= 7.0.3.1)" are indented with 6+ spaces and ignored
+      const match = /^ {4}([a-z0-9_-]+)\s+\(([^\s)]+)\)/.exec(line);
       if (match?.[1] && match[2]) {
         deps.push({ name: match[1], version: match[2], ecosystem: "rubygems" });
       }
