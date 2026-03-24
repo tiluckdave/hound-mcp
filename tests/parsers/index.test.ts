@@ -337,4 +337,32 @@ GEM
     expect(deps).toContainEqual({ name: "rails", version: "7.1.5.2", ecosystem: "rubygems" });
     expect(deps).toContainEqual({ name: "actionpack", version: "7.1.5.2", ecosystem: "rubygems" });
   });
+
+  it("normalizes platform-qualified gem versions", () => {
+    const content = `GEM
+  remote: https://rubygems.org/
+  specs:
+    nokogiri (1.14.2-x86_64-darwin)
+    ffi (1.15.5-x64_mingw32)
+    nio4r (2.5.8-java)
+`;
+    const deps = parseLockfile("Gemfile.lock", content);
+    expect(deps).toHaveLength(3);
+    expect(deps).toContainEqual({ name: "nokogiri", version: "1.14.2", ecosystem: "rubygems" });
+    expect(deps).toContainEqual({ name: "ffi", version: "1.15.5", ecosystem: "rubygems" });
+    expect(deps).toContainEqual({ name: "nio4r", version: "2.5.8", ecosystem: "rubygems" });
+  });
+
+  it("preserves legitimate prerelease identifiers", () => {
+    const content = `GEM
+  remote: https://rubygems.org/
+  specs:
+    rails (7.1.0-beta.1)
+    devise (5.0.0-rc1)
+`;
+    const deps = parseLockfile("Gemfile.lock", content);
+    expect(deps).toHaveLength(2);
+    expect(deps).toContainEqual({ name: "rails", version: "7.1.0-beta.1", ecosystem: "rubygems" });
+    expect(deps).toContainEqual({ name: "devise", version: "5.0.0-rc1", ecosystem: "rubygems" });
+  });
 });
