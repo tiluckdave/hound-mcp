@@ -365,4 +365,19 @@ GEM
     expect(deps).toContainEqual({ name: "rails", version: "7.1.0-beta.1", ecosystem: "rubygems" });
     expect(deps).toContainEqual({ name: "devise", version: "5.0.0-rc1", ecosystem: "rubygems" });
   });
+
+  it("handles gem names with uppercase letters and dots", () => {
+    const content = `GEM
+  remote: https://rubygems.org/
+  specs:
+    RubyInline (3.12.5)
+    net-ssh (7.0.1)
+    i18n (1.12.0)
+`;
+    const deps = parseLockfile("Gemfile.lock", content);
+    expect(deps).toHaveLength(3);
+    expect(deps).toContainEqual({ name: "RubyInline", version: "3.12.5", ecosystem: "rubygems" });
+    expect(deps).toContainEqual({ name: "net-ssh", version: "7.0.1", ecosystem: "rubygems" });
+    expect(deps).toContainEqual({ name: "i18n", version: "1.12.0", ecosystem: "rubygems" });
+  });
 });

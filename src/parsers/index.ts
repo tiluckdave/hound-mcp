@@ -235,17 +235,11 @@ function parseGemfileLock(content: string): ParsedDep[] {
       continue;
     }
 
-    // End of specs section (PLATFORMS, DEPENDENCIES, etc.)
-    if (inSpecs && line.length > 0 && !line.startsWith(" ")) {
-      inSpecs = false;
-      continue;
-    }
-
     if (inSpecs) {
       // Match gem spec entries: "    actioncable (7.0.3.1)"
       // Spec entries are indented with 4 spaces
       // Dependency lines like "      actionpack (= 7.0.3.1)" are indented with 6+ spaces and ignored
-      const match = /^ {4}([a-z0-9_-]+)\s+\(([^\s)]+)\)/.exec(line);
+      const match = /^ {4}([A-Za-z0-9_.-]+)\s+\(([^\s)]+)\)/.exec(line);
       if (match?.[1] && match[2]) {
         let version = match[2];
         // Strip platform suffix from versions like "1.14.2-x86_64-darwin" -> "1.14.2"
