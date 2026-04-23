@@ -6,7 +6,7 @@ Full reference for all 12 Hound MCP tools with syntax and example output.
 
 ## `hound_audit` ⭐
 
-Scan an entire lockfile for vulnerabilities. Parses `package-lock.json`, `yarn.lock`, `pnpm-lock.yaml`, `requirements.txt`, `Cargo.lock`, or `go.sum` and batch-queries OSV across all dependencies.
+Scan an entire lockfile for vulnerabilities. Parses `package-lock.json`, `yarn.lock`, `pnpm-lock.yaml`, `requirements.txt`, `Cargo.lock`, `go.sum`, or `Gemfile.lock` and batch-queries OSV across all dependencies.
 
 ```text
 hound_audit(lockfile_name: "package-lock.json", lockfile_content: "<contents>")

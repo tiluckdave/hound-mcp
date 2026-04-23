@@ -1,7 +1,7 @@
 export interface ParsedDep {
   name: string;
   version: string;
-  ecosystem: "npm" | "pypi" | "cargo" | "go";
+  ecosystem: "npm" | "pypi" | "cargo" | "go" | "rubygems";
 }
 
 /**
@@ -17,6 +17,7 @@ export function parseLockfile(filename: string, content: string): ParsedDep[] | 
   if (base === "requirements.txt") return parseRequirements(content);
   if (base === "Cargo.lock") return parseCargoLock(content);
   if (base === "go.sum") return parseGoSum(content);
+  if (base === "Gemfile.lock") return parseGemfileLock(content);
 
   return null;
 }
@@ -197,6 +198,58 @@ function parseGoSum(content: string): ParsedDep[] {
       if (!seen.has(key)) {
         seen.add(key);
         deps.push({ name: match[1], version: match[2], ecosystem: "go" });
+      }
+    }
+  }
+
+  return deps;
+}
+
+// ---------------------------------------------------------------------------
+// Gemfile.lock
+// ---------------------------------------------------------------------------
+function parseGemfileLock(content: string): ParsedDep[] {
+  const deps: ParsedDep[] = [];
+  const lines = content.split("\n");
+  let inGemSection = false;
+  let inSpecs = false;
+
+  for (const line of lines) {
+    // Track if we're in the GEM section (not GIT, PATH, etc.)
+    if (line.startsWith("GEM")) {
+      inGemSection = true;
+      inSpecs = false;
+      continue;
+    }
+
+    // Exit GEM section when we hit another top-level section
+    if (line.length > 0 && !line.startsWith(" ")) {
+      inGemSection = false;
+      inSpecs = false;
+      continue;
+    }
+
+    // Start of specs section (only parse if in GEM section)
+    if (inGemSection && line.trim() === "specs:") {
+      inSpecs = true;
+      continue;
+    }
+
+    if (inSpecs) {
+      // Match gem spec entries: "    actioncable (7.0.3.1)"
+      // Spec entries are indented with 4 spaces
+      // Dependency lines like "      actionpack (= 7.0.3.1)" are indented with 6+ spaces and ignored
+      const match = /^ {4}([A-Za-z0-9_.-]+)\s+\(([^\s)]+)\)/.exec(line);
+      if (match?.[1] && match[2]) {
+        let version = match[2];
+        // Strip platform suffix from versions like "1.14.2-x86_64-darwin" -> "1.14.2"
+        // Platform suffixes follow the pattern: -<platform>-<os> or -<platform>, at the end of the string
+        // Keep legitimate prerelease identifiers like "7.1.0-beta.1-x86_64-darwin" -> "7.1.0-beta.1"
+        const platformMatch = /^(.+)-(x86_64|arm64|aarch64|universal|java|mingw32|mswin32|x64_mingw32)(?:-[a-z0-9_]+)?$/i.exec(version);
+        if (platformMatch?.[1]) {
+          version = platformMatch[1];
+        }
+        deps.push({ name: match[1], version, ecosystem: "rubygems" });
       }
     }
   }

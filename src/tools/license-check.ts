@@ -45,7 +45,7 @@ export function register(server: McpServer) {
         lockfile_content: z.string().describe("Full text content of the lockfile"),
         lockfile_name: z
           .string()
-          .describe("Filename: package-lock.json, yarn.lock, pnpm-lock.yaml, requirements.txt, Cargo.lock, go.sum"),
+          .describe("Filename: package-lock.json, yarn.lock, pnpm-lock.yaml, requirements.txt, Cargo.lock, go.sum, Gemfile.lock"),
         policy: z
           .enum(["permissive", "copyleft", "none"])
           .default("permissive")
@@ -62,7 +62,7 @@ export function register(server: McpServer) {
           content: [
             {
               type: "text",
-              text: `Unsupported lockfile format: ${lockfile_name}\n\nSupported: package-lock.json, yarn.lock, pnpm-lock.yaml, requirements.txt, Cargo.lock, go.sum`,
+              text: `Unsupported lockfile format: ${lockfile_name}\n\nSupported: package-lock.json, yarn.lock, pnpm-lock.yaml, requirements.txt, Cargo.lock, go.sum, Gemfile.lock`,
             },
           ],
         };
