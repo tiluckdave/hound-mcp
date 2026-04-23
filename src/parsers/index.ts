@@ -223,7 +223,7 @@ function parseGemfileLock(content: string): ParsedDep[] {
     }
 
     // Exit GEM section when we hit another top-level section
-    if (line.length > 0 && !line.startsWith(" ") && line !== "GEM") {
+    if (line.length > 0 && !line.startsWith(" ")) {
       inGemSection = false;
       inSpecs = false;
       continue;
@@ -245,7 +245,7 @@ function parseGemfileLock(content: string): ParsedDep[] {
         // Strip platform suffix from versions like "1.14.2-x86_64-darwin" -> "1.14.2"
         // Platform suffixes follow the pattern: -<platform>-<os> or -<platform>, at the end of the string
         // Keep legitimate prerelease identifiers like "7.1.0-beta.1-x86_64-darwin" -> "7.1.0-beta.1"
-        const platformMatch = /^(.+)-(x86_64|arm64|java|mingw32|mswin32|x64_mingw32)(?:-[a-z0-9_]+)?$/i.exec(version);
+        const platformMatch = /^(.+)-(x86_64|arm64|aarch64|universal|java|mingw32|mswin32|x64_mingw32)(?:-[a-z0-9_]+)?$/i.exec(version);
         if (platformMatch?.[1]) {
           version = platformMatch[1];
         }

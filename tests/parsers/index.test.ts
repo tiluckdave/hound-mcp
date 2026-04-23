@@ -343,14 +343,26 @@ GEM
   remote: https://rubygems.org/
   specs:
     nokogiri (1.14.2-x86_64-darwin)
+    nokogiri (1.14.2-aarch64-darwin)
+    nokogiri (1.14.2-universal-darwin)
     ffi (1.15.5-x64_mingw32)
     nio4r (2.5.8-java)
 `;
     const deps = parseLockfile("Gemfile.lock", content);
-    expect(deps).toHaveLength(3);
+    expect(deps).toHaveLength(5);
     expect(deps).toContainEqual({ name: "nokogiri", version: "1.14.2", ecosystem: "rubygems" });
     expect(deps).toContainEqual({ name: "ffi", version: "1.15.5", ecosystem: "rubygems" });
     expect(deps).toContainEqual({ name: "nio4r", version: "2.5.8", ecosystem: "rubygems" });
+  });
+
+  it("preserves prerelease when stripping platform suffix", () => {
+    const content = `GEM
+  remote: https://rubygems.org/
+  specs:
+    rails (7.1.0-beta.1-x86_64-darwin)
+`;
+    const deps = parseLockfile("Gemfile.lock", content);
+    expect(deps).toContainEqual({ name: "rails", version: "7.1.0-beta.1", ecosystem: "rubygems" });
   });
 
   it("preserves legitimate prerelease identifiers", () => {
