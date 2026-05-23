@@ -3,6 +3,7 @@ import { z } from "zod/v4";
 import { parseLockfile } from "../parsers/index.js";
 import { extractSeverity, queryVulnsBatch } from "../api/osv.js";
 import type { Ecosystem } from "../types/index.js";
+import { formatUnsupportedLockfileMessage } from "../utils/lockfileFormat.js";
 
 const MAX_BATCH = 100; // cap to avoid huge requests
 
@@ -39,7 +40,7 @@ export function register(server: McpServer) {
           content: [
             {
               type: "text",
-              text: `Unsupported lockfile format: ${lockfile_name}\n\nSupported formats: package-lock.json, yarn.lock, pnpm-lock.yaml, requirements.txt, Cargo.lock, go.sum, Gemfile.lock`,
+              text: formatUnsupportedLockfileMessage(lockfile_name),
             },
           ],
         };

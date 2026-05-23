@@ -73,6 +73,18 @@ describe("hound_license_check", () => {
     expect(text).toContain("Unsupported lockfile format");
   });
 
+  it("suggests a similar supported lockfile format", async () => {
+    const result = await (tool.handler as (args: Record<string, unknown>) => Promise<unknown>)({
+      lockfile_content: "{}",
+      lockfile_name: "pip-freeze.txt",
+      policy: "permissive",
+    });
+
+    const text = (result as { content: { text: string }[] }).content[0]?.text ?? "";
+    expect(text).toContain("Did you mean: requirements.txt?");
+    expect(text).toContain("requirements.txt (Python/pip)");
+  });
+
   it("reports license distribution summary", async () => {
     vi.mocked(depsdev.getVersion).mockResolvedValue(mockVersion(["Apache-2.0"]));
 

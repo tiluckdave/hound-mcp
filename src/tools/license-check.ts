@@ -4,6 +4,7 @@ import { getVersion } from "../api/depsdev.js";
 import { COPYLEFT_LICENSES, NETWORK_COPYLEFT } from "../constants/licenses.js";
 import { parseLockfile } from "../parsers/index.js";
 import type { Ecosystem } from "../types/index.js";
+import { formatUnsupportedLockfileMessage } from "../utils/lockfileFormat.js";
 
 // Licenses allowed under each policy
 const POLICY_ALLOWLISTS: Record<"permissive" | "copyleft", Set<string>> = {
@@ -98,7 +99,7 @@ export function register(server: McpServer) {
           content: [
             {
               type: "text",
-              text: `Unsupported lockfile format: ${lockfile_name}\n\nSupported: package-lock.json, yarn.lock, pnpm-lock.yaml, requirements.txt, Cargo.lock, go.sum, Gemfile.lock`,
+              text: formatUnsupportedLockfileMessage(lockfile_name),
             },
           ],
         };
