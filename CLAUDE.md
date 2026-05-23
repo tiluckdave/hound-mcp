@@ -6,17 +6,17 @@ This file is for contributors making bug fixes and enhancements. It describes ho
 
 ## Tech Stack
 
-| Concern | Tool |
-| --- | --- |
-| Language | TypeScript (strict mode) |
-| Runtime | Node.js 18+ |
-| MCP SDK | `@modelcontextprotocol/sdk` |
-| Validation | Zod (import from `zod/v4`) |
-| Build | tsup |
-| Testing | Vitest |
-| Linting | ESLint + typescript-eslint |
-| Formatting | Prettier |
-| Package manager | pnpm |
+| Concern         | Tool                        |
+| --------------- | --------------------------- |
+| Language        | TypeScript (strict mode)    |
+| Runtime         | Node.js 18+                 |
+| MCP SDK         | `@modelcontextprotocol/sdk` |
+| Validation      | Zod (import from `zod/v4`)  |
+| Build           | tsup                        |
+| Testing         | Vitest                      |
+| Linting         | ESLint + typescript-eslint  |
+| Formatting      | Prettier                    |
+| Package manager | pnpm                        |
 
 ---
 
@@ -176,7 +176,11 @@ describe("hound_your_tool", () => {
 
   it("does the thing", async () => {
     vi.mocked(osv.queryVulns).mockResolvedValue([]);
-    const result = await (tool.handler as (args: Record<string, unknown>) => Promise<unknown>)({ name: "express", version: "4.19.2", ecosystem: "npm" });
+    const result = await (tool.handler as (args: Record<string, unknown>) => Promise<unknown>)({
+      name: "express",
+      version: "4.19.2",
+      ecosystem: "npm",
+    });
     expect((result as { content: { text: string }[] }).content[0]?.text).toContain("expected text");
   });
 });

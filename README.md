@@ -60,11 +60,11 @@ Add to your MCP config file:
 
 #### Config file locations
 
-| Client | Config path |
-| ------ | ----------- |
+| Client                 | Config path                                                       |
+| ---------------------- | ----------------------------------------------------------------- |
 | Claude Desktop (macOS) | `~/Library/Application Support/Claude/claude_desktop_config.json` |
-| Cursor | `~/.cursor/mcp.json` |
-| Windsurf | `~/.codeium/windsurf/mcp_config.json` |
+| Cursor                 | `~/.cursor/mcp.json`                                              |
+| Windsurf               | `~/.codeium/windsurf/mcp_config.json`                             |
 
 ---
 
@@ -72,20 +72,20 @@ Add to your MCP config file:
 
 12 tools → [Full reference with example outputs](docs/tools.md)
 
-| Tool | What it does |
-| ---- | ------------ |
-| `hound_audit` ⭐ | Scan an entire lockfile for vulnerabilities across all dependencies |
-| `hound_score` | 0–100 Hound Score (vulns + scorecard + recency + license) with letter grade |
-| `hound_compare` | Side-by-side comparison of two packages with a recommendation |
-| `hound_preinstall` | GO / CAUTION / NO-GO verdict before installing a package |
-| `hound_upgrade` | Find the minimum safe version upgrade that resolves all known vulns |
-| `hound_license_check` | Scan a lockfile for license compliance against a policy |
-| `hound_vulns` | All known vulnerabilities for a package version, grouped by severity |
-| `hound_inspect` | Full package profile — license, vulns, scorecard, stars, dep count |
-| `hound_tree` | Full resolved dependency tree with transitive deps |
-| `hound_typosquat` | Detect typosquatting variants of a package name |
-| `hound_advisories` | Full advisory details by GHSA, CVE, or OSV ID |
-| `hound_popular` | Scan popular packages for known vulnerabilities |
+| Tool                  | What it does                                                                |
+| --------------------- | --------------------------------------------------------------------------- |
+| `hound_audit` ⭐      | Scan an entire lockfile for vulnerabilities across all dependencies         |
+| `hound_score`         | 0–100 Hound Score (vulns + scorecard + recency + license) with letter grade |
+| `hound_compare`       | Side-by-side comparison of two packages with a recommendation               |
+| `hound_preinstall`    | GO / CAUTION / NO-GO verdict before installing a package                    |
+| `hound_upgrade`       | Find the minimum safe version upgrade that resolves all known vulns         |
+| `hound_license_check` | Scan a lockfile for license compliance against a policy                     |
+| `hound_vulns`         | All known vulnerabilities for a package version, grouped by severity        |
+| `hound_inspect`       | Full package profile — license, vulns, scorecard, stars, dep count          |
+| `hound_tree`          | Full resolved dependency tree with transitive deps                          |
+| `hound_typosquat`     | Detect typosquatting variants of a package name                             |
+| `hound_advisories`    | Full advisory details by GHSA, CVE, or OSV ID                               |
+| `hound_popular`       | Scan popular packages for known vulnerabilities                             |
 
 **Supported ecosystems:** `npm` · `pypi` · `go` · `maven` · `cargo` · `nuget` · `rubygems`
 
@@ -93,11 +93,11 @@ Add to your MCP config file:
 
 3 prompts you can invoke directly from your AI client. → [Full prompt reference](docs/prompts.md)
 
-| Prompt | What it does |
-| ------ | ------------ |
-| `security_audit` | Full project security audit — vulns, licenses, typosquats |
-| `package_evaluation` | Go/no-go recommendation before adding a new dependency |
-| `pre_release_check` | Pre-ship dependency scan that flags release blockers |
+| Prompt               | What it does                                              |
+| -------------------- | --------------------------------------------------------- |
+| `security_audit`     | Full project security audit — vulns, licenses, typosquats |
+| `package_evaluation` | Go/no-go recommendation before adding a new dependency    |
+| `pre_release_check`  | Pre-ship dependency scan that flags release blockers      |
 
 ## Use Cases
 

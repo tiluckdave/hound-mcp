@@ -16,9 +16,9 @@ Full project security audit. Scans for vulnerabilities, license issues, and typo
 
 ### Parameters
 
-| Parameter | Required | Description |
-| --------- | -------- | ----------- |
-| `ecosystem` | Yes | Package ecosystem (`npm`, `pypi`, `go`, `maven`, `cargo`, `nuget`, `rubygems`) |
+| Parameter   | Required | Description                                                                    |
+| ----------- | -------- | ------------------------------------------------------------------------------ |
+| `ecosystem` | Yes      | Package ecosystem (`npm`, `pypi`, `go`, `maven`, `cargo`, `nuget`, `rubygems`) |
 
 ### What it does
 
@@ -46,11 +46,11 @@ Go/no-go recommendation before adding a new dependency to your project.
 
 ### Parameters
 
-| Parameter | Required | Description |
-| --------- | -------- | ----------- |
-| `package` | Yes | Package name to evaluate |
-| `version` | No | Specific version (defaults to latest) |
-| `ecosystem` | Yes | Package ecosystem |
+| Parameter   | Required | Description                           |
+| ----------- | -------- | ------------------------------------- |
+| `package`   | Yes      | Package name to evaluate              |
+| `version`   | No       | Specific version (defaults to latest) |
+| `ecosystem` | Yes      | Package ecosystem                     |
 
 ### What it does
 
@@ -77,9 +77,9 @@ Pre-ship dependency scan. Flags any release blockers in your current dependency 
 
 ### Parameters
 
-| Parameter | Required | Description |
-| --------- | -------- | ----------- |
-| `version` | No | The release version you're cutting (for context in the report) |
+| Parameter | Required | Description                                                    |
+| --------- | -------- | -------------------------------------------------------------- |
+| `version` | No       | The release version you're cutting (for context in the report) |
 
 ### What it does
 

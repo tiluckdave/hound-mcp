@@ -350,11 +350,11 @@ hound_license_check(lockfile_name: "package-lock.json", lockfile_content: "<cont
 
 ### Policies
 
-| Policy | Allows |
-| ------ | ------ |
-| `permissive` | MIT, Apache-2.0, BSD only |
-| `copyleft` | Allows GPL but not AGPL |
-| `none` | Report only — no violations flagged |
+| Policy       | Allows                              |
+| ------------ | ----------------------------------- |
+| `permissive` | MIT, Apache-2.0, BSD only           |
+| `copyleft`   | Allows GPL but not AGPL             |
+| `none`       | Report only — no violations flagged |
 
 ### Example: hound_license_check
 
