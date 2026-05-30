@@ -59,6 +59,34 @@ describe("hound_typosquat", () => {
     expect(text).toContain("5 versions");
   });
 
+  it("checks character substitution variants", async () => {
+    vi.mocked(depsdev.getPackage).mockImplementation(async (_, name) => {
+      if (name === "lodash" || name === "l0dash") return makePackage(name, 3);
+      throw new Error("Not found");
+    });
+
+    const result = await (
+      tool.handler as (args: Record<string, unknown>, extra?: unknown) => Promise<unknown>
+    )({ name: "lodash", ecosystem: "npm" });
+    const text = getText(result);
+    expect(text).toContain("l0dash");
+    expect(text).toContain("substitution");
+  });
+
+  it("checks double-character variants", async () => {
+    vi.mocked(depsdev.getPackage).mockImplementation(async (_, name) => {
+      if (name === "express" || name === "expresss") return makePackage(name, 2);
+      throw new Error("Not found");
+    });
+
+    const result = await (
+      tool.handler as (args: Record<string, unknown>, extra?: unknown) => Promise<unknown>
+    )({ name: "express", ecosystem: "npm" });
+    const text = getText(result);
+    expect(text).toContain("expresss");
+    expect(text).toContain("double-character");
+  });
+
   it("warns when target package doesn't exist", async () => {
     vi.mocked(depsdev.getPackage).mockRejectedValue(new Error("Not found"));
 

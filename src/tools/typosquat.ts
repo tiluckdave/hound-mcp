@@ -15,6 +15,15 @@ import type { Ecosystem } from "../types/index.js";
  */
 function generateTypos(name: string): string[] {
   const variants = new Set<string>();
+  const substitutions: Record<string, string[]> = {
+    a: ["4"],
+    e: ["3"],
+    i: ["1", "l"],
+    l: ["1", "i"],
+    o: ["0"],
+    s: ["5"],
+    t: ["7"],
+  };
 
   // Omit each character
   for (let i = 0; i < name.length; i++) {
@@ -26,6 +35,19 @@ function generateTypos(name: string): string[] {
     const a = name.charAt(i);
     const b = name.charAt(i + 1);
     variants.add(name.slice(0, i) + b + a + name.slice(i + 2));
+  }
+
+  // Substitute visually similar characters (leet-speak / homoglyph-like typos)
+  for (let i = 0; i < name.length; i++) {
+    const char = name.charAt(i).toLowerCase();
+    for (const replacement of substitutions[char] ?? []) {
+      variants.add(name.slice(0, i) + replacement + name.slice(i + 1));
+    }
+  }
+
+  // Duplicate each character (common key-repeat typo)
+  for (let i = 0; i < name.length; i++) {
+    variants.add(name.slice(0, i) + name.charAt(i) + name.slice(i));
   }
 
   // Hyphen/underscore confusion
@@ -113,7 +135,7 @@ export function register(server: McpServer) {
 
       lines.push("");
       lines.push(
-        `ℹ️  Checked ${variants.length} typo variants (omission, transposition, hyphen, affixes)`,
+        `ℹ️  Checked ${variants.length} typo variants (omission, transposition, substitution, double-character, hyphen, affixes)`,
       );
 
       return {
