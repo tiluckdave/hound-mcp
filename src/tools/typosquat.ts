@@ -28,6 +28,12 @@ function generateTypos(name: string): string[] {
     variants.add(name.slice(0, i) + b + a + name.slice(i + 2));
   }
 
+  // Double each character
+  for (let i = 0; i < name.length; i++) {
+    const char = name[i];
+    variants.add(name.slice(0, i) + char + name.slice(i));
+  }
+
   // Hyphen/underscore confusion
   if (name.includes("-")) {
     variants.add(name.replaceAll("-", "_"));
