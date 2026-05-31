@@ -135,7 +135,7 @@ export function register(server: McpServer) {
 
       lines.push("");
       lines.push(
-        `ℹ️  Checked ${variants.length} typo variants (omission, transposition, substitution, double-character, hyphen, affixes)`,
+        `ℹ️  Checked ${variants.length} typo variants (omission, transposition, substitution, double-character, hyphen/underscore, affixes)`,
       );
 
       return {

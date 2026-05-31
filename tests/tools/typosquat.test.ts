@@ -71,6 +71,7 @@ describe("hound_typosquat", () => {
     const text = getText(result);
     expect(text).toContain("l0dash");
     expect(text).toContain("substitution");
+    expect(text).toContain("hyphen/underscore");
   });
 
   it("checks double-character variants", async () => {
