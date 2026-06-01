@@ -141,8 +141,20 @@ export class DepsDevError extends Error {
 }
 
 /**
- * Get metadata for a specific package version.
- * Includes licenses, advisory keys, and related project links.
+ * Retrieves metadata for a specific package version from the deps.dev API.
+ *
+ * Includes information such as licenses, advisory references,
+ * related projects, publication date, and version details.
+ *
+ * @param ecosystem - The package ecosystem (npm, pypi, go, maven, cargo, nuget, or rubygems).
+ * @param name - The package name.
+ * @param version - The specific package version to retrieve.
+ * @returns Detailed metadata for the specified package version.
+ * @throws {DepsDevError} When the package version cannot be found or the API request fails.
+ *
+ * @example
+ * const version = await getVersion("npm", "express", "4.18.2");
+ * console.log(version.licenses);
  */
 export async function getVersion(
   ecosystem: Ecosystem,
@@ -156,8 +168,18 @@ export async function getVersion(
 }
 
 /**
- * Get all versions of a package.
- * Useful for finding available upgrade targets.
+ * Retrieves metadata for a package and all available versions.
+ *
+ * Useful for exploring package history and identifying upgrade targets.
+ *
+ * @param ecosystem - The package ecosystem.
+ * @param name - The package name.
+ * @returns Package metadata including version information.
+ * @throws {DepsDevError} When the package cannot be found or the API request fails.
+ *
+ * @example
+ * const pkg = await getPackage("npm", "express");
+ * console.log(pkg.versions.length);
  */
 export async function getPackage(ecosystem: Ecosystem, name: string): Promise<DepsDevPackage> {
   const sys = ECOSYSTEM_MAP[ecosystem];
@@ -165,9 +187,20 @@ export async function getPackage(ecosystem: Ecosystem, name: string): Promise<De
 }
 
 /**
- * Get the full resolved dependency graph for a package version.
- * Returns nodes (packages) and edges (dependency relationships).
- * relationType: SELF = the package itself, DIRECT = direct deps, INDIRECT = transitive deps.
+ * Retrieves the fully resolved dependency graph for a package version.
+ *
+ * The response contains dependency nodes and dependency edges,
+ * allowing traversal of direct and transitive dependencies.
+ *
+ * @param ecosystem - The package ecosystem.
+ * @param name - The package name.
+ * @param version - The package version.
+ * @returns Dependency graph containing nodes and edges.
+ * @throws {DepsDevError} When dependency information cannot be retrieved.
+ *
+ * @example
+ * const deps = await getDependencies("npm", "express", "4.18.2");
+ * console.log(deps.nodes.length);
  */
 export async function getDependencies(
   ecosystem: Ecosystem,
@@ -181,8 +214,19 @@ export async function getDependencies(
 }
 
 /**
- * Get project metadata and OpenSSF Scorecard for a GitHub/GitLab project.
- * projectId format: "github.com/owner/repo"
+ * Retrieves project metadata and OpenSSF Scorecard information.
+ *
+ * Project identifiers are typically source repository paths such as
+ * github.com/owner/repository.
+ *
+ * @param projectId - Project identifier in the format "github.com/owner/repo".
+ * @returns Project metadata including stars, forks, license information,
+ * description, homepage, and scorecard data.
+ * @throws {DepsDevError} When the project cannot be found or the API request fails.
+ *
+ * @example
+ * const project = await getProject("github.com/expressjs/express");
+ * console.log(project.starsCount);
  */
 export async function getProject(projectId: string): Promise<DepsDevProject> {
   const encoded = projectId.replaceAll("/", "%2F");
@@ -190,15 +234,35 @@ export async function getProject(projectId: string): Promise<DepsDevProject> {
 }
 
 /**
- * Get full advisory details by advisory ID (e.g. "GHSA-rv95-896h-c2vc").
+ * Retrieves advisory details from deps.dev using an advisory identifier.
+ *
+ * Advisory records include severity information, aliases,
+ * vulnerability references, and CVSS data.
+ *
+ * @param advisoryId - Advisory identifier such as a GHSA ID.
+ * @returns Advisory details associated with the provided identifier.
+ * @throws {DepsDevError} When the advisory cannot be found or the API request fails.
+ *
+ * @example
+ * const advisory = await getAdvisory("GHSA-rv95-896h-c2vc");
+ * console.log(advisory.title);
  */
 export async function getAdvisory(advisoryId: string): Promise<DepsDevAdvisory> {
   return get<DepsDevAdvisory>(`/advisories/${encodeURIComponent(advisoryId)}`);
 }
 
 /**
- * Extract the GitHub/GitLab project ID from a version's relatedProjects list.
- * Returns the first SOURCE_REPO or ISSUE_TRACKER project ID found, or null.
+ * Extracts a source repository or issue tracker project identifier
+ * from a package version's related projects list.
+ *
+ * The function returns the first SOURCE_REPO or ISSUE_TRACKER entry found.
+ *
+ * @param version - Package version metadata returned by deps.dev.
+ * @returns Project identifier if available; otherwise null.
+ *
+ * @example
+ * const projectId = extractProjectId(version);
+ * console.log(projectId);
  */
 export function extractProjectId(version: DepsDevVersion): string | null {
   const related = version.relatedProjects ?? [];

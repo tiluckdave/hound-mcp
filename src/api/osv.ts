@@ -108,8 +108,17 @@ export class OsvError extends Error {
 }
 
 /**
- * Query vulnerabilities for a single package@version.
- * Returns an empty array if no vulnerabilities are found.
+ * Query vulnerabilities for a specific package version.
+ *
+ * @param ecosystem - Package ecosystem (npm, PyPI, Go, Maven, etc.)
+ * @param name - Package name
+ * @param version - Package version to check
+ * @returns Array of vulnerabilities affecting the package version
+ * @throws {OsvError} When the OSV API request fails
+ *
+ * @example
+ * const vulns = await queryVulns("npm", "express", "4.17.1");
+ * console.log(vulns.length);
  */
 export async function queryVulns(
   ecosystem: Ecosystem,
@@ -127,9 +136,17 @@ export async function queryVulns(
 }
 
 /**
- * Query vulnerabilities for multiple packages in a single API call.
- * Returns results in the same order as the input packages array.
- * Packages with no vulnerabilities return an empty array.
+ * Query vulnerabilities for multiple packages in a single request.
+ *
+ * @param packages - List of package objects containing ecosystem, name, and version
+ * @returns Array of vulnerability arrays in the same order as the input packages
+ * @throws {OsvError} When the OSV API request fails
+ *
+ * @example
+ * const results = await queryVulnsBatch([
+ *   { ecosystem: "npm", name: "express", version: "4.17.1" },
+ *   { ecosystem: "npm", name: "lodash", version: "4.17.20" }
+ * ]);
  */
 export async function queryVulnsBatch(
   packages: { ecosystem: Ecosystem; name: string; version: string }[],
@@ -150,7 +167,15 @@ export async function queryVulnsBatch(
 }
 
 /**
- * Fetch full vulnerability details by OSV/GHSA ID.
+ * Fetch detailed vulnerability information by OSV or GHSA identifier.
+ *
+ * @param vulnId - Vulnerability identifier
+ * @returns Complete vulnerability details
+ * @throws {OsvError} When the vulnerability cannot be found
+ *
+ * @example
+ * const vuln = await getVuln("GHSA-rv95-896h-c2vc");
+ * console.log(vuln.summary);
  */
 export async function getVuln(vulnId: string): Promise<OsvVuln> {
   const url = `${BASE_URL}/vulns/${encodeURIComponent(vulnId)}`;
@@ -167,8 +192,10 @@ export async function getVuln(vulnId: string): Promise<OsvVuln> {
 }
 
 /**
- * Extract a human-readable severity level from an OSV vulnerability.
- * Prefers database_specific.severity, falls back to parsing CVSS score.
+ * Determine the severity level of a vulnerability.
+ *
+ * @param vuln - Vulnerability object returned by the OSV API
+ * @returns Severity level (LOW, MODERATE, HIGH, CRITICAL, or UNKNOWN)
  */
 export function extractSeverity(vuln: OsvVuln): Severity {
   // Prefer the GitHub advisory database severity label
@@ -188,9 +215,10 @@ export function extractSeverity(vuln: OsvVuln): Severity {
 }
 
 /**
- * Extract a numeric CVSS score from an OSV vulnerability.
- * Prefers CVSS_V3, falls back to V4, then V2.
- * Returns null if no CVSS score is available.
+ * Extract the CVSS score from a vulnerability record.
+ *
+ * @param vuln - Vulnerability object
+ * @returns Numeric CVSS score or null if unavailable
  */
 export function extractCvssScore(vuln: OsvVuln): number | null {
   const entries = vuln.severity ?? [];
@@ -206,8 +234,11 @@ export function extractCvssScore(vuln: OsvVuln): number | null {
 }
 
 /**
- * Extract fix versions from an OSV affected range.
- * Returns a deduplicated list of versions that fix the vulnerability.
+ * Extract versions that contain fixes for a vulnerability.
+ *
+ * @param vuln - Vulnerability object
+ * @param ecosystem - Package ecosystem
+ * @returns Array of fixed versions
  */
 export function extractFixVersions(vuln: OsvVuln, ecosystem: Ecosystem): string[] {
   const osvEcosystem = ECOSYSTEM_MAP[ecosystem];
