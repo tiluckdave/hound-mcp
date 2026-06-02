@@ -9,7 +9,6 @@ import type { Ecosystem } from "../types/index.js";
  * Covers the most common attack patterns:
  * - character omission (lodsh)
  * - character transposition (lodasg)
- * - character substitution (1odash, l0dash)
  * - hyphen/underscore confusion (lo_dash, lo-dash)
  * - common prefix/suffix additions (node-lodash, lodash-js)
  */
