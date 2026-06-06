@@ -18,6 +18,7 @@ export function parseLockfile(filename: string, content: string): ParsedDep[] | 
   if (base === "Cargo.lock") return parseCargoLock(content);
   if (base === "go.sum") return parseGoSum(content);
   if (base === "Gemfile.lock") return parseGemfileLock(content);
+  if (base === "Pipfile.lock") return parsePipfileLock(content);
 
   return null;
 }
@@ -259,6 +260,31 @@ function parseGemfileLock(content: string): ParsedDep[] {
         }
         deps.push({ name: match[1], version, ecosystem: "rubygems" });
       }
+    }
+  }
+
+  return deps;
+}
+// ---------------------------------------------------------------------------
+// Pipfile.lock (Pipenv)
+// ---------------------------------------------------------------------------
+function parsePipfileLock(content: string): ParsedDep[] {
+  let json: Record<string, unknown>;
+  try {
+    json = JSON.parse(content) as Record<string, unknown>;
+  } catch {
+    return [];
+  }
+
+  const deps: ParsedDep[] = [];
+
+  for (const section of ["default", "develop"]) {
+    const packages = json[section] as Record<string, { version?: string }> | undefined;
+    if (!packages) continue;
+    for (const [name, val] of Object.entries(packages)) {
+      if (!val.version) continue;
+      const version = val.version.replace(/^==/, "");
+      deps.push({ name, version, ecosystem: "pypi" });
     }
   }
 
