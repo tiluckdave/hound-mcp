@@ -10,3 +10,8 @@ updates:
     groups:
       dev-dependencies:
         dependency-type: development
+        # Keep major bumps out of the grouped PR so they get their own
+        # reviewable PR (a grouped TS 5->6 major broke CI in #58).
+        update-types:
+          - minor
+          - patch
