@@ -9,16 +9,18 @@ import type { Ecosystem } from "../types/index.js";
  * Covers the most common attack patterns:
  * - character omission (lodsh)
  * - character transposition (lodasg)
- * - character substitution (1odash, l0dash)
  * - hyphen/underscore confusion (lo_dash, lo-dash)
  * - common prefix/suffix additions (node-lodash, lodash-js)
  */
-function generateTypos(name: string): string[] {
+export function generateTypos(name: string): string[] {
   const variants = new Set<string>();
 
   // Omit each character
   for (let i = 0; i < name.length; i++) {
-    variants.add(name.slice(0, i) + name.slice(i + 1));
+    const variant = name.slice(0, i) + name.slice(i + 1);
+    if (variant.length > 0) {
+      variants.add(variant);
+    }
   }
 
   // Transpose adjacent characters
