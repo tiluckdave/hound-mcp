@@ -5,7 +5,7 @@ interface SupportedLockfile {
 }
 
 const SUPPORTED_LOCKFILES: SupportedLockfile[] = [
-  { filename: "package-lock.json", ecosystem: "npm", patterns: ["package", "npm"] },
+  { filename: "package-lock.json", ecosystem: "npm", patterns: ["package"] },
   { filename: "yarn.lock", ecosystem: "npm/Yarn", patterns: ["yarn"] },
   { filename: "pnpm-lock.yaml", ecosystem: "npm/pnpm", patterns: ["pnpm"] },
   { filename: "requirements.txt", ecosystem: "Python/pip", patterns: ["requirements", "pip"] },
