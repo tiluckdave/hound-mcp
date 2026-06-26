@@ -5,12 +5,29 @@ import { ECOSYSTEM_VALUES } from "../constants/ecosystems.js";
 import type { Ecosystem } from "../types/index.js";
 
 /**
+ * Character substitution map for leet-speak typosquat variants.
+ * Each letter maps to one or more visually/phonetically similar characters
+ * commonly used to disguise a typosquat package name (e.g. lodash -> 1odash).
+ * Kept intentionally small — only the most common substitutions.
+ */
+const LEET_SUBSTITUTIONS: Record<string, string[]> = {
+  l: ["1", "i"],
+  o: ["0"],
+  e: ["3"],
+  a: ["4", "@"],
+  s: ["5", "$"],
+  i: ["1", "l"],
+  t: ["7"],
+};
+
+/**
  * Generate likely typosquatting variants of a package name.
  * Covers the most common attack patterns:
  * - character omission (lodsh)
  * - character transposition (lodasg)
  * - hyphen/underscore confusion (lo_dash, lo-dash)
  * - common prefix/suffix additions (node-lodash, lodash-js)
+ * - character substitution / leet-speak (1odash, l0dash)
  */
 export function generateTypos(name: string): string[] {
   const variants = new Set<string>();
@@ -45,6 +62,17 @@ export function generateTypos(name: string): string[] {
   variants.add(`${name}-js`);
   variants.add(`${name}js`);
   variants.add(`${name}-node`);
+
+  // Character substitution (leet-speak)
+  for (let i = 0; i < name.length; i++) {
+    const char = name[i].toLowerCase();
+    const subs = LEET_SUBSTITUTIONS[char];
+    if (subs) {
+      for (const sub of subs) {
+        variants.add(name.slice(0, i) + sub + name.slice(i + 1));
+      }
+    }
+  }
 
   // Remove the original name
   variants.delete(name);
