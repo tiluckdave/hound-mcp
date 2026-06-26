@@ -1,7 +1,7 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import * as depsdev from "../api/depsdev.js";
-import { generateTypos, register } from "./typosquat.js";
+import * as depsdev from "../../src/api/depsdev.js";
+import { generateTypos, register } from "../../src/tools/typosquat.js";
 
 vi.mock("../../src/api/depsdev.js");
 
