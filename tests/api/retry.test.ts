@@ -24,8 +24,16 @@ describe("fetchWithRetry", () => {
     vi.useFakeTimers();
   });
 
-  afterEach(() => {
+  afterEach(async () => {
     vi.restoreAllMocks();
+
+    try {
+      await vi.runOnlyPendingTimersAsync();
+    } catch {
+      // no pending timers
+    }
+
+    vi.clearAllTimers();
     vi.useRealTimers();
   });
 

@@ -38,7 +38,7 @@ export async function fetchWithRetry(url: string, options?: unknown): Promise<Re
   const delays = [100, 400];
 
   for (let attempt = 0; attempt <= delays.length; attempt++) {
-    const response = await globalThis.fetch(url, options);
+    const response = await globalThis.fetch(url, options as RequestInit | undefined);
 
     if (![429, 503].includes(response.status)) {
       return response;
