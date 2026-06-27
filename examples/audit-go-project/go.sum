@@ -1,0 +1,4 @@
+github.com/gin-gonic/gin v1.6.3 h1:jL5gdAjJ3F4E6tYQ3Yms6h6H2UIZP1fYIv0G5f+7WcQ=
+github.com/gin-gonic/gin v1.6.3/go.mod h1:WFcDsz7s3HzaixfXgJUIrXGMQ8Qkz7lRiqjF9mCeKCQ=
+golang.org/x/crypto v0.0.0-20200622213623-75b288015ac9 h1:g6wqDtVfJqQ7f4mUXBv1TnVn7IY7xQm6Q6Zx9xH7vU=
+golang.org/x/crypto v0.0.0-20200622213623-75b288015ac9/go.mod h1:LzIPMQfyMNhhGPhlg8O9ptTrC2VkHRAoHq23G4eO5JA=
