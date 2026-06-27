@@ -235,7 +235,7 @@ describe("Pipfile.lock", () => {
       develop: {},
     });
     const result = parseLockfile("Pipfile.lock", content);
-    expect(result[0].version).toBe("1.24.0");
+    expect(result![0].version).toBe("1.24.0");
   });
 
   it("returns empty array for invalid JSON", () => {
@@ -253,7 +253,7 @@ describe("Pipfile.lock", () => {
     });
     const result = parseLockfile("Pipfile.lock", content);
     expect(result).toHaveLength(1);
-    expect(result[0].name).toBe("flask");
+    expect(result![0].name).toBe("flask");
   });
 });
 
@@ -453,10 +453,6 @@ GEM
   });
   
 });
-
-// ---------------------------------------------------------------------------
-// pubspec.lock
-// ---------------------------------------------------------------------------
 
 // ---------------------------------------------------------------------------
 // pubspec.lock
