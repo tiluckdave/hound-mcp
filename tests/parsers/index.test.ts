@@ -207,6 +207,57 @@ describe("requirements.txt", () => {
 });
 
 // ---------------------------------------------------------------------------
+// Pipfile.lock
+// ---------------------------------------------------------------------------
+
+describe("Pipfile.lock", () => {
+  it("extracts packages from default and develop sections", () => {
+    const content = JSON.stringify({
+      _meta: {},
+      default: {
+        requests: { version: "==2.28.0" },
+        flask: { version: "==2.3.0" },
+      },
+      develop: {
+        pytest: { version: "==7.4.0" },
+      },
+    });
+    const result = parseLockfile("Pipfile.lock", content);
+    expect(result).toHaveLength(3);
+    expect(result).toContainEqual({ name: "requests", version: "2.28.0", ecosystem: "pypi" });
+    expect(result).toContainEqual({ name: "flask", version: "2.3.0", ecosystem: "pypi" });
+    expect(result).toContainEqual({ name: "pytest", version: "7.4.0", ecosystem: "pypi" });
+  });
+
+  it("strips == prefix from versions", () => {
+    const content = JSON.stringify({
+      default: { numpy: { version: "==1.24.0" } },
+      develop: {},
+    });
+    const result = parseLockfile("Pipfile.lock", content);
+    expect(result[0].version).toBe("1.24.0");
+  });
+
+  it("returns empty array for invalid JSON", () => {
+    const result = parseLockfile("Pipfile.lock", "not valid json {{{");
+    expect(result).toEqual([]);
+  });
+
+  it("skips entries with no version field", () => {
+    const content = JSON.stringify({
+      default: {
+        boto3: {},
+        flask: { version: "==2.3.0" },
+      },
+      develop: {},
+    });
+    const result = parseLockfile("Pipfile.lock", content);
+    expect(result).toHaveLength(1);
+    expect(result[0].name).toBe("flask");
+  });
+});
+
+// ---------------------------------------------------------------------------
 // Cargo.lock
 // ---------------------------------------------------------------------------
 
@@ -400,4 +451,5 @@ GEM
     expect(deps).toContainEqual({ name: "net-ssh", version: "7.0.1", ecosystem: "rubygems" });
     expect(deps).toContainEqual({ name: "i18n", version: "1.12.0", ecosystem: "rubygems" });
   });
+  
 });
