@@ -88,7 +88,7 @@ export function register(server: McpServer) {
         lockfile_name: z
           .string()
           .describe(
-            "Filename: package-lock.json, yarn.lock, pnpm-lock.yaml, requirements.txt, Cargo.lock, go.sum, Gemfile.lock",
+            "Filename: package-lock.json, yarn.lock, pnpm-lock.yaml, requirements.txt, Cargo.lock, go.sum, Gemfile.lock , Pipfile.lock",
           ),
 
         policy: z

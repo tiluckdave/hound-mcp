@@ -18,6 +18,7 @@ export function parseLockfile(filename: string, content: string): ParsedDep[] | 
   if (base === "Cargo.lock") return parseCargoLock(content);
   if (base === "go.sum") return parseGoSum(content);
   if (base === "Gemfile.lock") return parseGemfileLock(content);
+  if (base === "Pipfile.lock") return parsePipfileLock(content);
   if (base === "pubspec.lock") return parsePubspecLock(content);
 
   return null;
@@ -329,7 +330,31 @@ function parseGemfileLock(content: string): ParsedDep[] {
 
   return deps;
 }
+// ---------------------------------------------------------------------------
+// Pipfile.lock (Pipenv)
+// ---------------------------------------------------------------------------
+function parsePipfileLock(content: string): ParsedDep[] {
+  let json: Record<string, unknown>;
+  try {
+    json = JSON.parse(content) as Record<string, unknown>;
+  } catch {
+    return [];
+  }
 
+  const deps: ParsedDep[] = [];
+
+  for (const section of ["default", "develop"]) {
+    const packages = json[section] as Record<string, { version?: string }> | undefined;
+    if (!packages) continue;
+    for (const [name, val] of Object.entries(packages)) {
+      if (!val.version) continue;
+      const version = val.version.replace(/^==/, "");
+      deps.push({ name, version, ecosystem: "pypi" });
+    }
+  }
+
+  return deps;
+}
 // ---------------------------------------------------------------------------
 // pubspec.lock (Dart/Flutter)
 // ---------------------------------------------------------------------------
@@ -354,40 +379,28 @@ function parsePubspecLock(content: string): ParsedDep[] {
       continue;
     }
 
-    if (!inPackages) {
-      continue;
-    }
+    if (!inPackages) continue;
 
     const nameMatch = /^ {2}(\S+):/.exec(line);
-
     if (nameMatch?.[1]) {
       currentName = nameMatch[1];
       currentSource = null;
       continue;
     }
 
-    if (!currentName) {
-      continue;
-    }
+    if (!currentName) continue;
 
     const sourceMatch = /^ {4}source:\s+"?([^\s"]+)"?/.exec(line);
-
     if (sourceMatch?.[1]) {
       currentSource = sourceMatch[1];
       continue;
     }
 
     const versionMatch = /^ {4}version:\s+"?([^\s"]+)"?/.exec(line);
-
     if (versionMatch?.[1]) {
       if (currentSource !== "sdk") {
-        deps.push({
-          name: currentName,
-          version: versionMatch[1],
-          ecosystem: "pub",
-        });
+        deps.push({ name: currentName, version: versionMatch[1], ecosystem: "pub" });
       }
-
       currentName = null;
       currentSource = null;
     }

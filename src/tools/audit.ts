@@ -22,13 +22,13 @@ export function register(server: McpServer) {
     "hound_audit",
     {
       description:
-        "Scan a project's lockfile for dependency risks. Parses package-lock.json, yarn.lock, pnpm-lock.yaml, requirements.txt, Cargo.lock, go.sum, Gemfile.lock, or pubspec.lock and batch-queries OSV for vulnerabilities across all dependencies.",
+        "Scan a project's lockfile for dependency risks. Parses package-lock.json, yarn.lock, pnpm-lock.yaml, requirements.txt, Cargo.lock, go.sum, Gemfile.lock, pubspec.lock, or Pipfile.lock and batch-queries OSV for vulnerabilities across all dependencies.",
       inputSchema: {
         lockfile_content: z.string().describe("Full text content of the lockfile"),
         lockfile_name: z
           .string()
           .describe(
-            "Filename to determine format: package-lock.json, yarn.lock, pnpm-lock.yaml, requirements.txt, Cargo.lock, go.sum, Gemfile.lock, or pubspec.lock",
+            "Filename to determine format: package-lock.json, yarn.lock, pnpm-lock.yaml, requirements.txt, Cargo.lock, go.sum, Gemfile.lock , pubspec.lock , Pipfile.lock",
           ),
       },
     },
