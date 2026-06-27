@@ -8,7 +8,7 @@
  * Ecosystem names in URLs must be uppercase (NPM, PYPI, GO, MAVEN, CARGO, NUGET, RUBYGEMS).
  * Project keys use %2F encoding for slashes (github.com%2Fowner%2Frepo).
  */
-
+import { fetchWithRetry } from "./retry.js";
 import type { Ecosystem } from "../types/index.js";
 
 const BASE_URL = "https://api.deps.dev/v3";
@@ -137,11 +137,8 @@ export interface DepsDevAdvisory {
 
 async function get<T>(path: string): Promise<T> {
   const url = `${BASE_URL}${path}`;
-
-  const res = await fetch(url, {
-    headers: {
-      "User-Agent": `hound-mcp/${__APP_VERSION__}`,
-    },
+  const res = await fetchWithRetry(url, {
+    headers: { "User-Agent": `hound-mcp/${__APP_VERSION__}` },
   });
 
   if (!res.ok) {
@@ -183,15 +180,10 @@ export async function getVersion(
  * Get all versions of a package.
  * Useful for finding available upgrade targets.
  */
-export async function getPackage(
-  ecosystem: Ecosystem,
-  name: string,
-): Promise<DepsDevPackage> {
+export async function getPackage(ecosystem: Ecosystem, name: string): Promise<DepsDevPackage> {
   const system = getDepsDevSystem(ecosystem);
 
-  return get<DepsDevPackage>(
-    `/systems/${system}/packages/${encodeURIComponent(name)}`,
-  );
+  return get<DepsDevPackage>(`/systems/${system}/packages/${encodeURIComponent(name)}`);
 }
 
 /**
@@ -226,9 +218,7 @@ export async function getProject(projectId: string): Promise<DepsDevProject> {
  * Example: "GHSA-rv95-896h-c2vc"
  */
 export async function getAdvisory(advisoryId: string): Promise<DepsDevAdvisory> {
-  return get<DepsDevAdvisory>(
-    `/advisories/${encodeURIComponent(advisoryId)}`,
-  );
+  return get<DepsDevAdvisory>(`/advisories/${encodeURIComponent(advisoryId)}`);
 }
 
 /**
@@ -240,8 +230,7 @@ export function extractProjectId(version: DepsDevVersion): string | null {
 
   const sourceRepo = related.find(
     (relation) =>
-      relation.relationType === "SOURCE_REPO" ||
-      relation.relationType === "ISSUE_TRACKER",
+      relation.relationType === "SOURCE_REPO" || relation.relationType === "ISSUE_TRACKER",
   );
 
   return sourceRepo?.projectKey.id ?? null;

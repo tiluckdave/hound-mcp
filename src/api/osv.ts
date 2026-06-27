@@ -7,7 +7,7 @@
  *
  * Ecosystem names use OSV convention (npm, PyPI, Go, Maven, crates.io, NuGet, RubyGems).
  */
-
+import { fetchWithRetry } from "./retry.js";
 import type { Ecosystem, Severity } from "../types/index.js";
 
 const BASE_URL = "https://api.osv.dev/v1";
@@ -80,7 +80,7 @@ export interface OsvBatchResponse {
 
 async function post<TResponse>(path: string, body: unknown): Promise<TResponse> {
   const url = `${BASE_URL}${path}`;
-  const res = await fetch(url, {
+  const res = await fetchWithRetry(url, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -155,7 +155,7 @@ export async function queryVulnsBatch(
  */
 export async function getVuln(vulnId: string): Promise<OsvVuln> {
   const url = `${BASE_URL}/vulns/${encodeURIComponent(vulnId)}`;
-  const res = await fetch(url, {
+  const res = await fetchWithRetry(url, {
     headers: { "User-Agent": `hound-mcp/${__APP_VERSION__}` },
   });
 
