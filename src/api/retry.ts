@@ -8,14 +8,8 @@ interface RetryResponse {
   json(): Promise<unknown>;
 }
 
-declare const fetch: (url: string, options?: unknown) => Promise<RetryResponse>;
-
-declare function setTimeout(handler: () => void, timeout: number): unknown;
-
 function sleep(ms: number): Promise<void> {
-  return new Promise((resolve) => {
-    setTimeout(resolve, ms);
-  });
+  return new Promise((resolve) => globalThis.setTimeout(resolve, ms));
 }
 
 export function getRetryDelay(response: RetryResponse, fallbackDelay: number): number {
@@ -44,7 +38,7 @@ export async function fetchWithRetry(url: string, options?: unknown): Promise<Re
   const delays = [100, 400];
 
   for (let attempt = 0; attempt <= delays.length; attempt++) {
-    const response = await fetch(url, options);
+    const response = await globalThis.fetch(url, options);
 
     if (![429, 503].includes(response.status)) {
       return response;

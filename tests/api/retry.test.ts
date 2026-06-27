@@ -25,8 +25,8 @@ describe("fetchWithRetry", () => {
   });
 
   afterEach(() => {
-    vi.useRealTimers();
     vi.restoreAllMocks();
+    vi.useRealTimers();
   });
 
   it("retries and eventually succeeds", async () => {
