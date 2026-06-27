@@ -18,7 +18,7 @@ function sleep(ms: number): Promise<void> {
   });
 }
 
-function getRetryDelay(response: RetryResponse, fallbackDelay: number): number {
+export function getRetryDelay(response: RetryResponse, fallbackDelay: number): number {
   const retryAfter = response.headers?.get("Retry-After");
 
   if (!retryAfter) {
@@ -56,7 +56,7 @@ export async function fetchWithRetry(url: string, options?: unknown): Promise<Re
 
     const fallbackDelay = delays[attempt] ?? 400;
 
-    const delay = getRetryDelay(response, fallbackDelay);
+    const delay = Math.min(getRetryDelay(response, fallbackDelay), 5000);
 
     await sleep(delay);
   }
