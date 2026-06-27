@@ -1,7 +1,7 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import * as depsdev from "../../src/api/depsdev.js";
-import { register } from "../../src/tools/typosquat.js";
+import { generateTypos, register } from "../../src/tools/typosquat.js";
 
 vi.mock("../../src/api/depsdev.js");
 
@@ -67,5 +67,51 @@ describe("hound_typosquat", () => {
     )({ name: "myfakepackage", ecosystem: "npm" });
     const text = getText(result);
     expect(text).toContain("does not exist");
+  });
+});
+
+describe("generateTypos", () => {
+  it("generates character omission variants", () => {
+    const variants = generateTypos("lodash");
+
+    expect(variants).toContain("odash");
+    expect(variants).toContain("lodas");
+    expect(variants).toContain("ldash");
+  });
+
+  it("generates character transposition variants", () => {
+    const variants = generateTypos("lodash");
+
+    expect(variants).toContain("oldash");
+    expect(variants).toContain("ldoash");
+  });
+
+  it("generates hyphen and underscore variants", () => {
+    expect(generateTypos("my-package")).toEqual(
+      expect.arrayContaining(["my_package", "mypackage"]),
+    );
+    expect(generateTypos("my_package")).toEqual(
+      expect.arrayContaining(["my-package", "mypackage"]),
+    );
+  });
+
+  it("generates common prefix and suffix variants", () => {
+    const variants = generateTypos("axios");
+
+    expect(variants).toContain("node-axios");
+    expect(variants).toContain("axios-js");
+    expect(variants).toContain("axiosjs");
+  });
+
+  it("does not include the original package name", () => {
+    const variants = generateTypos("lodash");
+
+    expect(variants).not.toContain("lodash");
+  });
+
+  it("does not create an empty variant for single-character names", () => {
+    const variants = generateTypos("x");
+
+    expect(variants).not.toContain("");
   });
 });

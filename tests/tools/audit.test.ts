@@ -87,4 +87,25 @@ describe("hound_audit", () => {
     const text = (result as { content: { text: string }[] }).content[0]?.text ?? "";
     expect(text).toContain("Unsupported lockfile format");
   });
+
+  it("suggests a similar supported lockfile format", async () => {
+    const result = await (tool.handler as (args: Record<string, unknown>) => Promise<unknown>)({
+      lockfile_content: "{}",
+      lockfile_name: "package.json",
+    });
+
+    const text = (result as { content: { text: string }[] }).content[0]?.text ?? "";
+    expect(text).toContain("Did you mean: package-lock.json?");
+    expect(text).toContain("package-lock.json (npm)");
+  });
+
+  it("suggests pnpm-lock.yaml for a pnpm lockfile typo", async () => {
+    const result = await (tool.handler as (args: Record<string, unknown>) => Promise<unknown>)({
+      lockfile_content: "{}",
+      lockfile_name: "pnpm.lock",
+    });
+
+    const text = (result as { content: { text: string }[] }).content[0]?.text ?? "";
+    expect(text).toContain("Did you mean: pnpm-lock.yaml?");
+  });
 });

@@ -20,6 +20,7 @@ const ECOSYSTEM_MAP: Record<Ecosystem, string> = {
   cargo: "crates.io",
   nuget: "NuGet",
   rubygems: "RubyGems",
+  pub: "Pub",
 };
 
 export interface OsvSeverityEntry {

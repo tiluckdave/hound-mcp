@@ -1,10 +1,11 @@
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod/v4";
-import { parseLockfile } from "../parsers/index.js";
 import { extractSeverity, queryVulnsBatch } from "../api/osv.js";
+import { parseLockfile } from "../parsers/index.js";
 import type { Ecosystem } from "../types/index.js";
+import { formatUnsupportedLockfileMessage } from "../utils/lockfileFormat.js";
 
-const MAX_BATCH = 100; // cap to avoid huge requests
+const MAX_BATCH = 100; // Cap to avoid huge requests
 
 const SEVERITY_ORDER = ["CRITICAL", "HIGH", "MODERATE", "LOW", "UNKNOWN"] as const;
 
@@ -21,13 +22,13 @@ export function register(server: McpServer) {
     "hound_audit",
     {
       description:
-        "Scan a project's lockfile for dependency risks. Parses package-lock.json, yarn.lock, pnpm-lock.yaml, requirements.txt, Cargo.lock, go.sum, Gemfile.lock, or Pipfile.lock and batch-queries OSV for vulnerabilities across all dependencies.",
+        "Scan a project's lockfile for dependency risks. Parses package-lock.json, yarn.lock, pnpm-lock.yaml, requirements.txt, Cargo.lock, go.sum, Gemfile.lock, pubspec.lock, or Pipfile.lock and batch-queries OSV for vulnerabilities across all dependencies.",
       inputSchema: {
         lockfile_content: z.string().describe("Full text content of the lockfile"),
         lockfile_name: z
           .string()
           .describe(
-            "Filename to determine format: package-lock.json, yarn.lock, pnpm-lock.yaml, requirements.txt, Cargo.lock, go.sum, Gemfile.lock , Pipfile.lock",
+            "Filename to determine format: package-lock.json, yarn.lock, pnpm-lock.yaml, requirements.txt, Cargo.lock, go.sum, Gemfile.lock , pubspec.lock , Pipfile.lock",
           ),
       },
     },
@@ -39,7 +40,7 @@ export function register(server: McpServer) {
           content: [
             {
               type: "text",
-              text: `Unsupported lockfile format: ${lockfile_name}\n\nSupported formats: package-lock.json, yarn.lock, pnpm-lock.yaml, requirements.txt, Cargo.lock, go.sum, Gemfile.lock, Pipfile.lock`,
+              text: formatUnsupportedLockfileMessage(lockfile_name),
             },
           ],
         };
@@ -56,11 +57,16 @@ export function register(server: McpServer) {
         };
       }
 
-      // Deduplicate by name@version
+      // Deduplicate dependencies by name and version.
       const seen = new Set<string>();
-      const unique = deps.filter((d) => {
-        const key = `${d.name}@${d.version}`;
-        if (seen.has(key)) return false;
+
+      const unique = deps.filter((dependency) => {
+        const key = `${dependency.name}@${dependency.version}`;
+
+        if (seen.has(key)) {
+          return false;
+        }
+
         seen.add(key);
         return true;
       });
@@ -68,16 +74,15 @@ export function register(server: McpServer) {
       const toCheck = unique.slice(0, MAX_BATCH);
       const truncated = unique.length > MAX_BATCH;
 
-      // Batch query OSV
-      const vulnResults = await queryVulnsBatch(
-        toCheck.map((d) => ({
-          ecosystem: d.ecosystem as Ecosystem,
-          name: d.name,
-          version: d.version,
+      // Query OSV for all selected dependencies in one batch.
+      const vulnerabilityResults = await queryVulnsBatch(
+        toCheck.map((dependency) => ({
+          ecosystem: dependency.ecosystem as Ecosystem,
+          name: dependency.name,
+          version: dependency.version,
         })),
       );
 
-      // Build vulnerability findings
       interface Finding {
         name: string;
         version: string;
@@ -87,79 +92,98 @@ export function register(server: McpServer) {
       }
 
       const findings: Finding[] = [];
-      const vulnCounts: Partial<Record<string, number>> = {};
+      const vulnerabilityCounts: Partial<Record<string, number>> = {};
 
-      for (let i = 0; i < toCheck.length; i++) {
-        const dep = toCheck[i];
-        const vulns = vulnResults[i] ?? [];
-        if (!dep) continue;
-        for (const v of vulns) {
-          const sev = extractSeverity(v);
-          vulnCounts[sev] = (vulnCounts[sev] ?? 0) + 1;
+      for (let index = 0; index < toCheck.length; index++) {
+        const dependency = toCheck[index];
+
+        if (!dependency) {
+          continue;
+        }
+
+        const vulnerabilities = vulnerabilityResults[index] ?? [];
+
+        for (const vulnerability of vulnerabilities) {
+          const severity = extractSeverity(vulnerability);
+
+          vulnerabilityCounts[severity] = (vulnerabilityCounts[severity] ?? 0) + 1;
+
           findings.push({
-            name: dep.name,
-            version: dep.version,
-            severity: sev,
-            id: v.id,
-            summary: v.summary,
+            name: dependency.name,
+            version: dependency.version,
+            severity,
+            id: vulnerability.id,
+            summary: vulnerability.summary,
           });
         }
       }
 
-      const totalVulns = findings.length;
-      const affectedPkgs = new Set(findings.map((f) => `${f.name}@${f.version}`)).size;
+      const totalVulnerabilities = findings.length;
 
-      // --- Report ---
+      const affectedPackages = new Set(
+        findings.map((finding) => `${finding.name}@${finding.version}`),
+      ).size;
+
       const lines: string[] = [
         "📊 Hound Audit Report",
         "═".repeat(50),
         `Lockfile: ${lockfile_name}`,
-        `Scanned:  ${toCheck.length} dependencies${truncated ? ` (capped at ${MAX_BATCH} of ${unique.length})` : ""}`,
+        `Scanned:  ${toCheck.length} dependencies${
+          truncated ? ` (capped at ${MAX_BATCH} of ${unique.length})` : ""
+        }`,
         "",
       ];
 
-      // Summary counts
-      if (totalVulns === 0) {
+      if (totalVulnerabilities === 0) {
         lines.push("✅ No known vulnerabilities found!");
       } else {
         lines.push(
-          `Found ${totalVulns} vulnerabilit${totalVulns === 1 ? "y" : "ies"} across ${affectedPkgs} package${affectedPkgs === 1 ? "" : "s"}:`,
+          `Found ${totalVulnerabilities} vulnerabilit${
+            totalVulnerabilities === 1 ? "y" : "ies"
+          } across ${affectedPackages} package${affectedPackages === 1 ? "" : "s"}:`,
         );
-        for (const sev of SEVERITY_ORDER) {
-          const count = vulnCounts[sev] ?? 0;
+
+        for (const severity of SEVERITY_ORDER) {
+          const count = vulnerabilityCounts[severity] ?? 0;
+
           if (count > 0) {
-            const icon = SEVERITY_ICON[sev] ?? "⚪";
-            lines.push(`  ${icon} ${count} ${sev.toLowerCase()}`);
+            const icon = SEVERITY_ICON[severity] ?? "⚪";
+            lines.push(`  ${icon} ${count} ${severity.toLowerCase()}`);
           }
         }
       }
 
       lines.push("");
 
-      // Detailed findings grouped by severity
       if (findings.length > 0) {
         lines.push("─".repeat(50));
         lines.push("Vulnerable Packages");
         lines.push("─".repeat(50));
 
-        for (const sev of SEVERITY_ORDER) {
-          const group = findings.filter((f) => f.severity === sev);
-          if (group.length === 0) continue;
+        for (const severity of SEVERITY_ORDER) {
+          const group = findings.filter((finding) => finding.severity === severity);
 
-          const icon = SEVERITY_ICON[sev] ?? "⚪";
-          lines.push(`\n${icon} ${sev} (${group.length})`);
-
-          // Group by package
-          const byPkg: Record<string, Finding[]> = {};
-          for (const f of group) {
-            const key = `${f.name}@${f.version}`;
-            (byPkg[key] ??= []).push(f);
+          if (group.length === 0) {
+            continue;
           }
 
-          for (const [pkg, pkgFindings] of Object.entries(byPkg)) {
-            lines.push(`  ${pkg}`);
-            for (const f of pkgFindings) {
-              lines.push(`    ${f.id}: ${f.summary}`);
+          const icon = SEVERITY_ICON[severity] ?? "⚪";
+          lines.push(`\n${icon} ${severity} (${group.length})`);
+
+          const findingsByPackage: Record<string, Finding[]> = {};
+
+          for (const finding of group) {
+            const key = `${finding.name}@${finding.version}`;
+            (findingsByPackage[key] ??= []).push(finding);
+          }
+
+          for (const [packageName, packageFindings] of Object.entries(
+            findingsByPackage,
+          )) {
+            lines.push(`  ${packageName}`);
+
+            for (const finding of packageFindings) {
+              lines.push(`    ${finding.id}: ${finding.summary}`);
             }
           }
         }
@@ -181,7 +205,12 @@ export function register(server: McpServer) {
       lines.push("Source: OSV.dev");
 
       return {
-        content: [{ type: "text", text: lines.join("\n") }],
+        content: [
+          {
+            type: "text",
+            text: lines.join("\n"),
+          },
+        ],
       };
     },
   );

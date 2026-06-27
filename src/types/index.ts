@@ -6,7 +6,7 @@
 // Ecosystems
 // ---------------------------------------------------------------------------
 
-export type Ecosystem = "npm" | "pypi" | "go" | "maven" | "cargo" | "nuget" | "rubygems";
+export type Ecosystem = "npm" | "pypi" | "go" | "maven" | "cargo" | "nuget" | "rubygems" | "pub";
 
 // ---------------------------------------------------------------------------
 // Parsed dependency (output of lockfile parsers)

@@ -28,3 +28,6 @@ pnpm-debug.log*
 
 # Local planning docs
 hound-*.md
+
+# Agent session artifacts (e.g. accidentally committed in #75)
+.omo/
