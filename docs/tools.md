@@ -4,15 +4,15 @@ Full reference for all 12 Hound MCP tools with syntax and example output.
 
 ---
 
-## `hound_audit` ⭐
+## `audit` ⭐
 
 Scan an entire lockfile for vulnerabilities. Parses `package-lock.json`, `yarn.lock`, `pnpm-lock.yaml`, `requirements.txt`, `Cargo.lock`, `go.sum`, or `Gemfile.lock` and batch-queries OSV across all dependencies.
 
 ```text
-hound_audit(lockfile_name: "package-lock.json", lockfile_content: "<contents>")
+audit(lockfile_name: "package-lock.json", lockfile_content: "<contents>")
 ```
 
-### Example: hound_audit
+### Example: audit
 
 ```text
 🐕 Hound Audit — package-lock.json
@@ -42,15 +42,15 @@ Source: OSV.dev
 
 ---
 
-## `hound_vulns`
+## `vulns`
 
 List all known vulnerabilities for a specific package version, grouped by severity with fix versions.
 
 ```text
-hound_vulns(name: "lodash", version: "4.17.20", ecosystem: "npm")
+vulns(name: "lodash", version: "4.17.20", ecosystem: "npm")
 ```
 
-### Example: hound_vulns
+### Example: vulns
 
 ```text
 🔍 Vulnerabilities in lodash@4.17.20 (npm)
@@ -86,15 +86,15 @@ Source: https://osv.dev
 
 ---
 
-## `hound_inspect`
+## `inspect`
 
 Comprehensive package profile — license, vulnerabilities, OpenSSF Scorecard, GitHub stars, and dep count in one call.
 
 ```text
-hound_inspect(name: "express", version: "4.18.2", ecosystem: "npm")
+inspect(name: "express", version: "4.18.2", ecosystem: "npm")
 ```
 
-### Example: hound_inspect
+### Example: inspect
 
 ```text
 📦 express@4.18.2 (npm)
@@ -120,15 +120,15 @@ hound_inspect(name: "express", version: "4.18.2", ecosystem: "npm")
 
 ---
 
-## `hound_score`
+## `score`
 
 Compute a 0–100 Hound Score combining vulnerability severity (40 pts), OpenSSF Scorecard (25 pts), release recency (20 pts), and license risk (15 pts). Returns a letter grade A–F.
 
 ```text
-hound_score(name: "express", version: "4.18.2", ecosystem: "npm")
+score(name: "express", version: "4.18.2", ecosystem: "npm")
 ```
 
-### Example: hound_score
+### Example: score
 
 ```text
 🟡 Hound Score: 80/100 — Grade B
@@ -154,15 +154,15 @@ Source: OSV.dev + deps.dev
 
 ---
 
-## `hound_upgrade`
+## `upgrade`
 
 Find the minimum version upgrade that resolves all known vulnerabilities. Checks every published version and returns the nearest safe one.
 
 ```text
-hound_upgrade(name: "lodash", version: "4.17.20", ecosystem: "npm")
+upgrade(name: "lodash", version: "4.17.20", ecosystem: "npm")
 ```
 
-### Example: hound_upgrade
+### Example: upgrade
 
 ```text
 🔍 Safe upgrade finder: lodash (npm)
@@ -182,15 +182,15 @@ Source: OSV.dev + deps.dev
 
 ---
 
-## `hound_compare`
+## `compare`
 
 Side-by-side comparison of two packages across vulnerabilities, OpenSSF Scorecard, GitHub stars, release recency, and license. Returns a recommendation.
 
 ```text
-hound_compare(package_a: "express", package_b: "fastify", ecosystem: "npm")
+compare(package_a: "express", package_b: "fastify", ecosystem: "npm")
 ```
 
-### Example: hound_compare
+### Example: compare
 
 ```text
 ⚖️  Package Comparison (npm)
@@ -212,15 +212,15 @@ Source: OSV.dev + deps.dev
 
 ---
 
-## `hound_preinstall`
+## `preinstall`
 
 Safety check before installing a package. Checks vulnerabilities, typosquatting risk, abandonment, and license. Returns a GO / CAUTION / NO-GO verdict.
 
 ```text
-hound_preinstall(name: "lodash", version: "4.17.20", ecosystem: "npm")
+preinstall(name: "lodash", version: "4.17.20", ecosystem: "npm")
 ```
 
-### Example: hound_preinstall
+### Example: preinstall
 
 ```text
 🚫 Pre-install check: lodash@4.17.20 (npm)
@@ -235,23 +235,23 @@ Verdict: NO-GO
 ──────────────────────────────
   • Package version is 3 year(s) old — may be abandoned
 
-💡 Run hound_vulns for full vulnerability details.
-💡 Run hound_upgrade to find a safe version.
+💡 Run vulns for full vulnerability details.
+💡 Run upgrade to find a safe version.
 
 Source: OSV.dev + deps.dev
 ```
 
 ---
 
-## `hound_tree`
+## `tree`
 
 Full resolved dependency tree including all transitive dependencies, with depth control.
 
 ```text
-hound_tree(name: "next", version: "14.2.0", ecosystem: "npm", maxDepth: 3)
+tree(name: "next", version: "14.2.0", ecosystem: "npm", maxDepth: 3)
 ```
 
-### Example: hound_tree
+### Example: tree
 
 ```text
 🌳 Dependency tree: next@14.2.0 (npm) — depth 3
@@ -278,16 +278,16 @@ Source: deps.dev
 
 ---
 
-## `hound_advisories`
+## `advisories`
 
 Full advisory details by ID — works with GHSA, CVE, and OSV IDs.
 
 ```text
-hound_advisories(id: "GHSA-35jh-r3h4-6jhm")
-hound_advisories(id: "CVE-2024-29041")
+advisories(id: "GHSA-35jh-r3h4-6jhm")
+advisories(id: "CVE-2024-29041")
 ```
 
-### Example: hound_advisories
+### Example: advisories
 
 ```text
 📋 Advisory: GHSA-35jh-r3h4-6jhm
@@ -311,15 +311,15 @@ Source: https://osv.dev/vulnerability/GHSA-35jh-r3h4-6jhm
 
 ---
 
-## `hound_typosquat`
+## `typosquat`
 
 Generates likely typo variants of a package name and checks which ones exist in the registry — surfaces potential typosquatting attacks.
 
 ```text
-hound_typosquat(name: "lodash", ecosystem: "npm")
+typosquat(name: "lodash", ecosystem: "npm")
 ```
 
-### Example: hound_typosquat
+### Example: typosquat
 
 ```text
 🔎 Typosquat check: lodash (npm)
@@ -340,23 +340,15 @@ Source: deps.dev
 
 ---
 
-## `hound_license_check`
+## `license_check`
 
 Scan a lockfile for license compliance. Resolves licenses for all dependencies and flags packages that violate the chosen policy.
 
 ```text
-hound_license_check(lockfile_name: "package-lock.json", lockfile_content: "<contents>", policy: "permissive")
+license_check(lockfile_name: "package-lock.json", lockfile_content: "<contents>", policy: "permissive")
 ```
 
-### Policies
-
-| Policy       | Allows                              |
-| ------------ | ----------------------------------- |
-| `permissive` | MIT, Apache-2.0, BSD only           |
-| `copyleft`   | Allows GPL but not AGPL             |
-| `none`       | Report only — no violations flagged |
-
-### Example: hound_license_check
+### Example: license_check
 
 ```text
 📄 License Audit — package-lock.json (policy: permissive)
@@ -381,16 +373,16 @@ Source: deps.dev
 
 ---
 
-## `hound_popular`
+## `popular`
 
 Scan a list of popular (or user-specified) packages for known vulnerabilities.
 
 ```text
-hound_popular(ecosystem: "npm")
-hound_popular(ecosystem: "pypi", packages: ["requests", "flask", "django"])
+popular(ecosystem: "npm")
+popular(ecosystem: "pypi", packages: ["requests", "flask", "django"])
 ```
 
-### Example: hound_popular
+### Example: popular
 
 ```text
 🌐 Popular package scan — npm

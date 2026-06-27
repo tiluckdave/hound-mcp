@@ -22,9 +22,9 @@ export function preReleaseCheckRegisterPrompt(server: McpServer): void {
               text: `I'm about to release this project${versionNote}. Run a pre-release dependency check.
 
 Steps:
-1. Use \`hound_popular\` to scan all key packages in this project's ecosystem for known vulnerabilities.
-2. For any packages identified as critical to this project, use \`hound_vulns\` to check for vulnerabilities.
-3. Use \`hound_inspect\` on the top 5 dependencies by importance to verify licenses are compatible and no advisories are outstanding.
+1. Use \`popular\` to scan all key packages in this project's ecosystem for known vulnerabilities.
+2. For any packages identified as critical to this project, use \`vulns\` to check for vulnerabilities.
+3. Use \`inspect\` on the top 5 dependencies by importance to verify licenses are compatible and no advisories are outstanding.
 4. Flag any HIGH or CRITICAL severity vulnerabilities as **release blockers**.
 5. Flag any copyleft licenses (GPL, AGPL, LGPL) that may conflict with the project's MIT license as **license blockers**.
 

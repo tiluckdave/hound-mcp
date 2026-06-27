@@ -21,7 +21,7 @@ function compareVersions(a: string, b: string): number {
 
 export function register(server: McpServer) {
   return server.registerTool(
-    "hound_upgrade",
+    "upgrade",
     {
       description:
         "Find the minimum version upgrade that resolves all known vulnerabilities for a package. Checks every published version and returns the nearest safe one.",
@@ -92,8 +92,8 @@ export function register(server: McpServer) {
         );
         lines.push("");
         lines.push("Consider:");
-        lines.push("  • Checking if a patch is in progress via hound_advisories");
-        lines.push("  • Evaluating an alternative package via hound_compare");
+        lines.push("  • Checking if a patch is in progress via advisories");
+        lines.push("  • Evaluating an alternative package via compare");
       } else {
         const minimum = safeVersions[0] ?? "";
         const latest = safeVersions.at(-1) ?? "";

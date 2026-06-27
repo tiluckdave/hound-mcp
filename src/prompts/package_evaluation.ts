@@ -28,11 +28,11 @@ export function packageEvaluationRegisterPrompt(server: McpServer): void {
               text: `I'm considering adding ${versionNote}\`${pkg}\` (${eco}) as a dependency. Please evaluate it thoroughly.
 
 Steps:
-1. Use \`hound_inspect\` on \`${pkg}\`${version ? `@${version}` : ""} (ecosystem: ${eco}) to get the full health profile — licenses, vulnerabilities, OpenSSF Scorecard, GitHub stats.
-2. Use \`hound_vulns\` to get the full vulnerability list with fix versions.
-3. Use \`hound_typosquat\` to confirm this is the legitimate package and not a typosquat.
-4. Use \`hound_tree\` to check the transitive dependency count — packages with hundreds of transitive deps carry more supply chain risk.
-5. If any advisories are listed, use \`hound_advisories\` to get the details.
+1. Use \`inspect\` on \`${pkg}\`${version ? `@${version}` : ""} (ecosystem: ${eco}) to get the full health profile — licenses, vulnerabilities, OpenSSF Scorecard, GitHub stats.
+2. Use \`vulns\` to get the full vulnerability list with fix versions.
+3. Use \`typosquat\` to confirm this is the legitimate package and not a typosquat.
+4. Use \`tree\` to check the transitive dependency count — packages with hundreds of transitive deps carry more supply chain risk.
+5. If any advisories are listed, use \`advisories\` to get the details.
 
 Give me a clear **GO / NO-GO / CONDITIONAL** recommendation with reasoning. If conditional, state exactly what version or conditions would make it acceptable.`,
             },

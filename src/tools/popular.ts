@@ -62,7 +62,7 @@ const POPULAR_DEFAULTS: Record<string, string[]> = {
 
 export function register(server: McpServer) {
   return server.registerTool(
-    "hound_popular",
+    "popular",
     {
       description:
         "Scan a list of popular (or user-specified) packages for known vulnerabilities. Quickly surface which widely-used packages in an ecosystem have open security issues.",

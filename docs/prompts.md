@@ -23,8 +23,8 @@ Full project security audit. Scans for vulnerabilities, license issues, and typo
 ### What it does
 
 1. Reads your lockfile
-2. Runs `hound_audit` to surface all vulnerabilities grouped by severity
-3. Runs `hound_license_check` with your policy
+2. Runs `audit` to surface all vulnerabilities grouped by severity
+3. Runs `license_check` with your policy
 4. Flags any typosquat risks in your dependency names
 5. Returns a prioritized list of actions
 
@@ -54,9 +54,9 @@ Go/no-go recommendation before adding a new dependency to your project.
 
 ### What it does
 
-1. Runs `hound_preinstall` for a GO / CAUTION / NO-GO verdict
-2. Runs `hound_inspect` for a full package profile (license, stars, scorecard)
-3. Runs `hound_score` for the 0–100 Hound Score
+1. Runs `preinstall` for a GO / CAUTION / NO-GO verdict
+2. Runs `inspect` for a full package profile (license, stars, scorecard)
+3. Runs `score` for the 0–100 Hound Score
 4. Returns a clear recommendation with reasoning
 
 ### Example prompt
@@ -84,8 +84,8 @@ Pre-ship dependency scan. Flags any release blockers in your current dependency 
 ### What it does
 
 1. Reads your lockfile
-2. Runs `hound_audit` to check for any new or unresolved vulnerabilities
-3. Runs `hound_license_check` to catch any license regressions
+2. Runs `audit` to check for any new or unresolved vulnerabilities
+3. Runs `license_check` to catch any license regressions
 4. Returns a pass/fail verdict with a list of blockers that must be resolved before shipping
 
 ### Example prompt

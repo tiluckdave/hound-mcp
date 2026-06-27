@@ -74,18 +74,18 @@ Add to your MCP config file:
 
 | Tool                  | What it does                                                                |
 | --------------------- | --------------------------------------------------------------------------- |
-| `hound_audit` ⭐      | Scan an entire lockfile for vulnerabilities across all dependencies         |
-| `hound_score`         | 0–100 Hound Score (vulns + scorecard + recency + license) with letter grade |
-| `hound_compare`       | Side-by-side comparison of two packages with a recommendation               |
-| `hound_preinstall`    | GO / CAUTION / NO-GO verdict before installing a package                    |
-| `hound_upgrade`       | Find the minimum safe version upgrade that resolves all known vulns         |
-| `hound_license_check` | Scan a lockfile for license compliance against a policy                     |
-| `hound_vulns`         | All known vulnerabilities for a package version, grouped by severity        |
-| `hound_inspect`       | Full package profile — license, vulns, scorecard, stars, dep count          |
-| `hound_tree`          | Full resolved dependency tree with transitive deps                          |
-| `hound_typosquat`     | Detect typosquatting variants of a package name                             |
-| `hound_advisories`    | Full advisory details by GHSA, CVE, or OSV ID                               |
-| `hound_popular`       | Scan popular packages for known vulnerabilities                             |
+| `audit` ⭐      | Scan an entire lockfile for vulnerabilities across all dependencies         |
+| `score`         | 0–100 Hound Score (vulns + scorecard + recency + license) with letter grade |
+| `compare`       | Side-by-side comparison of two packages with a recommendation               |
+| `preinstall`    | GO / CAUTION / NO-GO verdict before installing a package                    |
+| `upgrade`       | Find the minimum safe version upgrade that resolves all known vulns         |
+| `license_check` | Scan a lockfile for license compliance against a policy                     |
+| `vulns`         | All known vulnerabilities for a package version, grouped by severity        |
+| `inspect`       | Full package profile — license, vulns, scorecard, stars, dep count          |
+| `tree`          | Full resolved dependency tree with transitive deps                          |
+| `typosquat`     | Detect typosquatting variants of a package name                             |
+| `advisories`    | Full advisory details by GHSA, CVE, or OSV ID                               |
+| `popular`       | Scan popular packages for known vulnerabilities                             |
 
 **Supported ecosystems:** `npm` · `pypi` · `go` · `maven` · `cargo` · `nuget` · `rubygems`
 
@@ -104,9 +104,9 @@ Add to your MCP config file:
 → [See full examples with real lockfiles and expected output](examples/)
 
 - **Before merging a PR** — scan the lockfile diff to catch newly introduced vulnerabilities before they land in main
-- **Auditing an inherited codebase** — run `hound_audit` on an existing lockfile to get a full report in seconds
-- **Checking a package before adding it** — use `hound_preinstall` to get a GO / CAUTION / NO-GO verdict
-- **License compliance** — run `hound_license_check` to ensure no GPL or AGPL packages sneak into a commercial project
+- **Auditing an inherited codebase** — run `audit` on an existing lockfile to get a full report in seconds
+- **Checking a package before adding it** — use `preinstall` to get a GO / CAUTION / NO-GO verdict
+- **License compliance** — run `license_check` to ensure no GPL or AGPL packages sneak into a commercial project
 - **CI security gate** — ask your AI agent to run a security audit as part of every release check
 
 ---
@@ -127,8 +127,8 @@ pnpm check        # typecheck + lint + test
 - [ ] **Docker support** — run Hound as a container for CI/CD pipelines
 - [ ] **`bun.lockb` parser** — Bun lockfile support
 - [ ] **`gradle.lockfile` parser** — Gradle (Java/Android) ecosystem support
-- [ ] **`hound_diff` tool** — compare two lockfile snapshots to surface newly introduced risks
-- [ ] **GitHub Action** — run `hound_audit` as a PR check without an AI agent
+- [ ] **`diff` tool** — compare two lockfile snapshots to surface newly introduced risks
+- [ ] **GitHub Action** — run `audit` as a PR check without an AI agent
 
 ## Contributing
 
