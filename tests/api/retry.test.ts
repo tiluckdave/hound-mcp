@@ -27,6 +27,12 @@ describe("fetchWithRetry", () => {
   afterEach(() => {
     vi.restoreAllMocks();
     vi.useRealTimers();
+  }, 15000); // 15 second timeout for cleanup
+
+  afterEach(async () => {
+    await vi.runOnlyPendingTimersAsync();
+    vi.restoreAllMocks();
+    vi.useRealTimers();
   });
 
   it("retries and eventually succeeds", async () => {
