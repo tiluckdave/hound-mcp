@@ -235,7 +235,7 @@ describe("Pipfile.lock", () => {
       develop: {},
     });
     const result = parseLockfile("Pipfile.lock", content);
-    expect(result![0]!.version).toBe("1.24.0");
+    expect(result).toEqual([{ name: "numpy", version: "1.24.0", ecosystem: "pypi" }]);
   });
 
   it("returns empty array for invalid JSON", () => {
@@ -252,8 +252,7 @@ describe("Pipfile.lock", () => {
       develop: {},
     });
     const result = parseLockfile("Pipfile.lock", content);
-    expect(result).toHaveLength(1);
-    expect(result![0]!.name).toBe("flask");
+    expect(result).toEqual([{ name: "flask", version: "2.3.0", ecosystem: "pypi" }]);
   });
 });
 
