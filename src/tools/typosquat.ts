@@ -11,14 +11,14 @@
      * Kept intentionally small — only the most common substitutions.
      */
     const LEET_SUBSTITUTIONS: Record<string, string[]> = {
-      l: ["1", "i"],
-      o: ["0"],
-      e: ["3"],
-      a: ["4", "@"],
-      s: ["5", "$"],
-      i: ["1", "l"],
-      t: ["7"],
-    };
+  l: ["1", "i"],
+  o: ["0"],
+  e: ["3"],
+  a: ["4"],
+  s: ["5"],
+  i: ["1", "l"],
+  t: ["7"],
+};
 
     /**
      * Generate likely typosquatting variants of a package name.

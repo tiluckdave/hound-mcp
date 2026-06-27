@@ -103,6 +103,14 @@ describe("generateTypos", () => {
     expect(variants).toContain("axiosjs");
   });
 
+  // NEW TEST (this is what the maintainer requested)
+  it("generates leet-speak variants", () => {
+    const variants = generateTypos("lodash");
+
+    expect(variants).toContain("1odash");
+    expect(variants).toContain("l0dash");
+  });
+
   it("does not include the original package name", () => {
     const variants = generateTypos("lodash");
 
