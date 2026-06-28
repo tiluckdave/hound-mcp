@@ -8,30 +8,35 @@ interface RetryResponse {
   json(): Promise<unknown>;
 }
 
+// Cap any single retry wait so a hostile/overloaded server's large Retry-After
+// can't freeze the tool for minutes (it runs as a local agent tool).
+const MAX_RETRY_DELAY_MS = 5000;
+
 function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => globalThis.setTimeout(resolve, ms));
 }
 
 export function getRetryDelay(response: RetryResponse, fallbackDelay: number): number {
+  const cap = (ms: number) => Math.min(ms, MAX_RETRY_DELAY_MS);
   const retryAfter = response.headers?.get("Retry-After");
 
   if (!retryAfter) {
-    return fallbackDelay;
+    return cap(fallbackDelay);
   }
 
   const seconds = Number(retryAfter);
 
   if (!Number.isNaN(seconds)) {
-    return seconds * 1000;
+    return cap(seconds * 1000);
   }
 
   const retryDate = Date.parse(retryAfter);
 
   if (!Number.isNaN(retryDate)) {
-    return Math.max(0, retryDate - Date.now());
+    return cap(Math.max(0, retryDate - Date.now()));
   }
 
-  return fallbackDelay;
+  return cap(fallbackDelay);
 }
 
 export async function fetchWithRetry(url: string, options?: unknown): Promise<RetryResponse> {
@@ -50,9 +55,7 @@ export async function fetchWithRetry(url: string, options?: unknown): Promise<Re
 
     const fallbackDelay = delays[attempt] ?? 400;
 
-    const delay = Math.min(getRetryDelay(response, fallbackDelay), 5000);
-
-    await sleep(delay);
+    await sleep(getRetryDelay(response, fallbackDelay));
   }
 
   throw new Error("Unexpected retry failure");

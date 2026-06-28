@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { fetchWithRetry, getRetryDelay } from "../../src/api/retry.js";
 
 function mockResponse(status: number, retryAfter?: string) {
@@ -7,11 +7,7 @@ function mockResponse(status: number, retryAfter?: string) {
     ok: status >= 200 && status < 300,
     headers: {
       get(name: string) {
-        if (name.toLowerCase() === "retry-after") {
-          return retryAfter ?? null;
-        }
-
-        return null;
+        return name.toLowerCase() === "retry-after" ? (retryAfter ?? null) : null;
       },
     },
     text: async () => "",
@@ -19,22 +15,33 @@ function mockResponse(status: number, retryAfter?: string) {
   };
 }
 
-describe("fetchWithRetry", () => {
-  beforeEach(() => {
-    vi.useFakeTimers();
+describe("getRetryDelay", () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
   });
 
-  afterEach(async () => {
+  it("parses numeric Retry-After headers", () => {
+    expect(getRetryDelay(mockResponse(429, "2"), 100)).toBe(2000);
+  });
+
+  it("parses HTTP-date Retry-After headers", () => {
+    vi.spyOn(Date, "now").mockReturnValue(Date.parse("2026-01-01T00:00:00.000Z"));
+
+    expect(getRetryDelay(mockResponse(429, "Thu, 01 Jan 2026 00:00:03 GMT"), 100)).toBe(3000);
+  });
+
+  it("caps the delay at five seconds", () => {
+    expect(getRetryDelay(mockResponse(429, "120"), 100)).toBe(5000);
+  });
+
+  it("falls back when there is no Retry-After header", () => {
+    expect(getRetryDelay(mockResponse(503), 100)).toBe(100);
+  });
+});
+
+describe("fetchWithRetry", () => {
+  afterEach(() => {
     vi.restoreAllMocks();
-
-    try {
-      await vi.runOnlyPendingTimersAsync();
-    } catch {
-      // no pending timers
-    }
-
-    vi.clearAllTimers();
-    vi.useRealTimers();
   });
 
   it("retries and eventually succeeds", async () => {
@@ -43,62 +50,19 @@ describe("fetchWithRetry", () => {
       .mockResolvedValueOnce(mockResponse(503) as never)
       .mockResolvedValueOnce(mockResponse(200) as never);
 
-    const promise = fetchWithRetry("https://example.com");
-
-    await vi.advanceTimersByTimeAsync(100);
-
-    const response = await promise;
+    const response = await fetchWithRetry("https://example.com");
 
     expect(response.status).toBe(200);
     expect(fetchMock).toHaveBeenCalledTimes(2);
   });
 
-  it("returns final response after exhausting retries", async () => {
-    const fetchMock = vi
-      .spyOn(globalThis, "fetch")
-      .mockResolvedValueOnce(mockResponse(503) as never)
-      .mockResolvedValueOnce(mockResponse(503) as never)
-      .mockResolvedValueOnce(mockResponse(503) as never);
+  it("returns the final response after exhausting retries", async () => {
+    const fetchMock = vi.spyOn(globalThis, "fetch").mockResolvedValue(mockResponse(503) as never);
 
-    const promise = fetchWithRetry("https://example.com");
-
-    await vi.advanceTimersByTimeAsync(100);
-    await vi.advanceTimersByTimeAsync(400);
-
-    const response = await promise;
+    const response = await fetchWithRetry("https://example.com");
 
     expect(response.status).toBe(503);
     expect(fetchMock).toHaveBeenCalledTimes(3);
-  });
-
-  it("parses numeric Retry-After headers", () => {
-    const response = mockResponse(429, "2");
-
-    expect(getRetryDelay(response, 100)).toBe(2000);
-  });
-
-  it("parses HTTP-date Retry-After headers", () => {
-    vi.setSystemTime(new Date("2026-01-01T00:00:00.000Z"));
-
-    const response = mockResponse(429, "Thu, 01 Jan 2026 00:00:03 GMT");
-
-    expect(getRetryDelay(response, 100)).toBe(3000);
-  });
-
-  it("caps Retry-After delays to five seconds", async () => {
-    const fetchMock = vi
-      .spyOn(globalThis, "fetch")
-      .mockResolvedValueOnce(mockResponse(429, "120") as never)
-      .mockResolvedValueOnce(mockResponse(200) as never);
-
-    const promise = fetchWithRetry("https://example.com");
-
-    await vi.advanceTimersByTimeAsync(5000);
-
-    const response = await promise;
-
-    expect(response.status).toBe(200);
-    expect(fetchMock).toHaveBeenCalledTimes(2);
   });
 
   it("does not retry non-retryable responses", async () => {
