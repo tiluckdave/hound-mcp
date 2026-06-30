@@ -15,6 +15,7 @@ export function parseLockfile(filename: string, content: string): ParsedDep[] | 
   if (base === "yarn.lock") return parseYarnLock(content);
   if (base === "pnpm-lock.yaml") return parsePnpmLock(content);
   if (base === "requirements.txt") return parseRequirements(content);
+  if (base === "poetry.lock") return parsePoetryLock(content);
   if (base === "Cargo.lock") return parseCargoLock(content);
   if (base === "go.sum") return parseGoSum(content);
   if (base === "Gemfile.lock") return parseGemfileLock(content);
@@ -195,6 +196,39 @@ function parseRequirements(content: string): ParsedDep[] {
       });
     }
   }
+
+  return deps;
+}
+
+// ---------------------------------------------------------------------------
+// poetry.lock (TOML)
+// ---------------------------------------------------------------------------
+function parsePoetryLock(content: string): ParsedDep[] {
+  const deps: ParsedDep[] = [];
+  let name: string | null = null;
+  let version: string | null = null;
+  let inPackage = false;
+
+  for (const raw of content.split("\n")) {
+    const line = raw.trim();
+    if (line === "[[package]]") {
+      if (name && version) deps.push({ name, version, ecosystem: "pypi" });
+      name = null;
+      version = null;
+      inPackage = true;
+    } else if (line.startsWith("[") && line.endsWith("]")) {
+      if (name && version) deps.push({ name, version, ecosystem: "pypi" });
+      name = null;
+      version = null;
+      inPackage = false;
+    } else if (inPackage) {
+      const nameMatch = /^name\s*=\s*"([^"]+)"/.exec(line);
+      if (nameMatch?.[1]) name = nameMatch[1];
+      const verMatch = /^version\s*=\s*"([^"]+)"/.exec(line);
+      if (verMatch?.[1]) version = verMatch[1];
+    }
+  }
+  if (name && version) deps.push({ name, version, ecosystem: "pypi" });
 
   return deps;
 }

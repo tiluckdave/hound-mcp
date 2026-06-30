@@ -62,6 +62,23 @@ requests==2.31.0  # inline comment
 Flask==3.0.0
 `;
 
+const POETRY_LOCK = `[[package]]
+name = "requests"
+version = "2.31.0"
+description = "Python HTTP for Humans."
+python-versions = ">=3.7"
+
+[[package]]
+name = "urllib3"
+version = "2.0.4"
+description = "HTTP library"
+python-versions = ">=3.8"
+
+[metadata]
+lock-version = "2.0"
+python-versions = "^3.11"
+`;
+
 const CARGO_LOCK = `[[package]]
 name = "serde"
 version = "1.0.188"
@@ -203,6 +220,59 @@ describe("requirements.txt", () => {
     expect(deps).toHaveLength(2);
     expect(deps).toContainEqual({ name: "requests", version: "2.31.0", ecosystem: "pypi" });
     expect(deps).toContainEqual({ name: "flask", version: "3.0.0", ecosystem: "pypi" });
+  });
+});
+
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// poetry.lock
+// ---------------------------------------------------------------------------
+
+describe("poetry.lock", () => {
+  it("parses package blocks", () => {
+    const deps = parseLockfile("poetry.lock", POETRY_LOCK);
+    expect(deps).toHaveLength(2);
+    expect(deps).toContainEqual({ name: "requests", version: "2.31.0", ecosystem: "pypi" });
+    expect(deps).toContainEqual({ name: "urllib3", version: "2.0.4", ecosystem: "pypi" });
+  });
+
+  it("returns empty array for empty content", () => {
+    expect(parseLockfile("poetry.lock", "")).toEqual([]);
+  });
+
+  it("skips incomplete package blocks without throwing", () => {
+    const content = `[[package]]
+name = "missing-version"
+[[package]]
+version = "1.0.0"
+[[package]]
+name = "complete"
+version = "2.0.0"
+`;
+    expect(() => parseLockfile("poetry.lock", content)).not.toThrow();
+    expect(parseLockfile("poetry.lock", content)).toEqual([
+      { name: "complete", version: "2.0.0", ecosystem: "pypi" },
+    ]);
+  });
+
+  it("ignores metadata section", () => {
+    const content = `[[package]]
+name = "requests"
+version = "2.31.0"
+[metadata]
+name = "not-a-package"
+version = "9.9.9"
+`;
+    expect(parseLockfile("poetry.lock", content)).toEqual([
+      { name: "requests", version: "2.31.0", ecosystem: "pypi" },
+    ]);
+  });
+
+  it("dispatches by basename", () => {
+    const deps = parseLockfile("/app/project/poetry.lock", POETRY_LOCK);
+    expect(deps).toHaveLength(2);
+    expect(deps).toContainEqual({ name: "requests", version: "2.31.0", ecosystem: "pypi" });
+    expect(deps).toContainEqual({ name: "urllib3", version: "2.0.4", ecosystem: "pypi" });
   });
 });
 
