@@ -325,7 +325,6 @@ describe("Pipfile.lock", () => {
     expect(result).toEqual([{ name: "flask", version: "2.3.0", ecosystem: "pypi" }]);
   });
 });
-});
 
 // ---------------------------------------------------------------------------
 // Cargo.lock
