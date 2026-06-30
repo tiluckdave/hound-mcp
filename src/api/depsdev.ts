@@ -8,12 +8,12 @@
  * Ecosystem names in URLs must be uppercase (NPM, PYPI, GO, MAVEN, CARGO, NUGET, RUBYGEMS).
  * Project keys use %2F encoding for slashes (github.com%2Fowner%2Frepo).
  */
-
+import { fetchWithRetry } from "./retry.js";
 import type { Ecosystem } from "../types/index.js";
 
 const BASE_URL = "https://api.deps.dev/v3";
 
-const ECOSYSTEM_MAP: Record<Ecosystem, string> = {
+const ECOSYSTEM_MAP: Partial<Record<Ecosystem, string>> = {
   npm: "npm",
   pypi: "pypi",
   go: "go",
@@ -22,6 +22,16 @@ const ECOSYSTEM_MAP: Record<Ecosystem, string> = {
   nuget: "nuget",
   rubygems: "rubygems",
 };
+
+function getDepsDevSystem(ecosystem: Ecosystem): string {
+  const system = ECOSYSTEM_MAP[ecosystem];
+
+  if (!system) {
+    throw new Error(`deps.dev does not support ecosystem: ${ecosystem}`);
+  }
+
+  return system;
+}
 
 export interface DepsDevVersionKey {
   system: string;
@@ -55,7 +65,10 @@ export interface DepsDevVersion {
 }
 
 export interface DepsDevPackage {
-  packageKey: { system: string; name: string };
+  packageKey: {
+    system: string;
+    name: string;
+  };
   versions: {
     versionKey: DepsDevVersionKey;
     publishedAt: string;
@@ -90,13 +103,18 @@ export interface DepsDevScorecardCheck {
 
 export interface DepsDevScorecard {
   date: string;
-  repository: { name: string; commit: string };
+  repository: {
+    name: string;
+    commit: string;
+  };
   overallScore: number;
   checks: DepsDevScorecardCheck[];
 }
 
 export interface DepsDevProject {
-  projectKey: { id: string };
+  projectKey: {
+    id: string;
+  };
   openIssuesCount: number;
   starsCount: number;
   forksCount: number;
@@ -107,7 +125,9 @@ export interface DepsDevProject {
 }
 
 export interface DepsDevAdvisory {
-  advisoryKey: { id: string };
+  advisoryKey: {
+    id: string;
+  };
   url: string;
   title: string;
   aliases: string[];
@@ -117,7 +137,7 @@ export interface DepsDevAdvisory {
 
 async function get<T>(path: string): Promise<T> {
   const url = `${BASE_URL}${path}`;
-  const res = await fetch(url, {
+  const res = await fetchWithRetry(url, {
     headers: { "User-Agent": `hound-mcp/${__APP_VERSION__}` },
   });
 
@@ -149,9 +169,10 @@ export async function getVersion(
   name: string,
   version: string,
 ): Promise<DepsDevVersion> {
-  const sys = ECOSYSTEM_MAP[ecosystem];
+  const system = getDepsDevSystem(ecosystem);
+
   return get<DepsDevVersion>(
-    `/systems/${sys}/packages/${encodeURIComponent(name)}/versions/${encodeURIComponent(version)}`,
+    `/systems/${system}/packages/${encodeURIComponent(name)}/versions/${encodeURIComponent(version)}`,
   );
 }
 
@@ -160,8 +181,9 @@ export async function getVersion(
  * Useful for finding available upgrade targets.
  */
 export async function getPackage(ecosystem: Ecosystem, name: string): Promise<DepsDevPackage> {
-  const sys = ECOSYSTEM_MAP[ecosystem];
-  return get<DepsDevPackage>(`/systems/${sys}/packages/${encodeURIComponent(name)}`);
+  const system = getDepsDevSystem(ecosystem);
+
+  return get<DepsDevPackage>(`/systems/${system}/packages/${encodeURIComponent(name)}`);
 }
 
 /**
@@ -174,9 +196,10 @@ export async function getDependencies(
   name: string,
   version: string,
 ): Promise<DepsDevDependencies> {
-  const sys = ECOSYSTEM_MAP[ecosystem];
+  const system = getDepsDevSystem(ecosystem);
+
   return get<DepsDevDependencies>(
-    `/systems/${sys}/packages/${encodeURIComponent(name)}/versions/${encodeURIComponent(version)}:dependencies`,
+    `/systems/${system}/packages/${encodeURIComponent(name)}/versions/${encodeURIComponent(version)}:dependencies`,
   );
 }
 
@@ -186,11 +209,13 @@ export async function getDependencies(
  */
 export async function getProject(projectId: string): Promise<DepsDevProject> {
   const encoded = projectId.replaceAll("/", "%2F");
+
   return get<DepsDevProject>(`/projects/${encoded}`);
 }
 
 /**
- * Get full advisory details by advisory ID (e.g. "GHSA-rv95-896h-c2vc").
+ * Get full advisory details by advisory ID.
+ * Example: "GHSA-rv95-896h-c2vc"
  */
 export async function getAdvisory(advisoryId: string): Promise<DepsDevAdvisory> {
   return get<DepsDevAdvisory>(`/advisories/${encodeURIComponent(advisoryId)}`);
@@ -202,8 +227,11 @@ export async function getAdvisory(advisoryId: string): Promise<DepsDevAdvisory> 
  */
 export function extractProjectId(version: DepsDevVersion): string | null {
   const related = version.relatedProjects ?? [];
+
   const sourceRepo = related.find(
-    (r) => r.relationType === "SOURCE_REPO" || r.relationType === "ISSUE_TRACKER",
+    (relation) =>
+      relation.relationType === "SOURCE_REPO" || relation.relationType === "ISSUE_TRACKER",
   );
+
   return sourceRepo?.projectKey.id ?? null;
 }
