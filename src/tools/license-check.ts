@@ -170,8 +170,7 @@ export function register(server: McpServer) {
         if (!dep) continue;
 
         const result = licenseResults[index];
-        const licenses =
-          result?.status === "fulfilled" ? (result.value.licenses ?? []) : [];
+        const licenses = result?.status === "fulfilled" ? (result.value.licenses ?? []) : [];
 
         // Count each license.
         for (const license of licenses) {
@@ -195,14 +194,9 @@ export function register(server: McpServer) {
         }
 
         const classification =
-          licenses.length === 0
-            ? "unknown"
-            : licenses.map(classifyLicense).join(", ");
+          licenses.length === 0 ? "unknown" : licenses.map(classifyLicense).join(", ");
 
-        if (
-          flagged ||
-          licenses.some((license) => classifyLicense(license) !== "permissive")
-        ) {
+        if (flagged || licenses.some((license) => classifyLicense(license) !== "permissive")) {
           results.push({
             name: dep.name,
             version: dep.version,
@@ -236,17 +230,12 @@ export function register(server: McpServer) {
         }
       } else {
         lines.push(
-          `⚠️  ${flagged.length} license violation${
-            flagged.length === 1 ? "" : "s"
-          } found`,
+          `⚠️  ${flagged.length} license violation${flagged.length === 1 ? "" : "s"} found`,
         );
         lines.push("─".repeat(50));
 
         for (const result of flagged) {
-          const license =
-            result.licenses.length > 0
-              ? result.licenses.join(", ")
-              : "unknown";
+          const license = result.licenses.length > 0 ? result.licenses.join(", ") : "unknown";
 
           lines.push(`  ${result.name}@${result.version}`);
           lines.push(`    License: ${license}`);

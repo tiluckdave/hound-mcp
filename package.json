@@ -52,6 +52,7 @@
     "lint": "eslint src/ tests/",
     "lint:fix": "eslint src/ tests/ --fix",
     "format": "prettier --write .",
+    "format:check": "prettier --check src/ tests/",
     "typecheck": "tsc --noEmit",
     "check": "pnpm typecheck && pnpm lint && pnpm test",
     "prepublishOnly": "pnpm check && pnpm build"

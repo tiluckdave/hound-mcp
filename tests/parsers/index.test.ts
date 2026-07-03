@@ -520,7 +520,6 @@ GEM
     expect(deps).toContainEqual({ name: "net-ssh", version: "7.0.1", ecosystem: "rubygems" });
     expect(deps).toContainEqual({ name: "i18n", version: "1.12.0", ecosystem: "rubygems" });
   });
-  
 });
 
 // ---------------------------------------------------------------------------

@@ -177,9 +177,7 @@ export function register(server: McpServer) {
             (findingsByPackage[key] ??= []).push(finding);
           }
 
-          for (const [packageName, packageFindings] of Object.entries(
-            findingsByPackage,
-          )) {
+          for (const [packageName, packageFindings] of Object.entries(findingsByPackage)) {
             lines.push(`  ${packageName}`);
 
             for (const finding of packageFindings) {

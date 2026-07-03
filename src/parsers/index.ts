@@ -40,9 +40,7 @@ function parsePackageLock(content: string): ParsedDep[] {
   const deps: ParsedDep[] = [];
 
   // v2/v3 format: "packages" object with keys like "node_modules/express"
-  const packages = json.packages as
-    | Record<string, { version?: string; dev?: boolean }>
-    | undefined;
+  const packages = json.packages as Record<string, { version?: string; dev?: boolean }> | undefined;
 
   if (packages) {
     for (const [key, val] of Object.entries(packages)) {

@@ -37,6 +37,9 @@ jobs:
       - name: Lint
         run: pnpm lint
 
+      - name: Format
+        run: pnpm format:check
+
       - name: Build
         run: pnpm build
 
@@ -66,3 +69,15 @@ jobs:
 
       - name: Test
         run: ${{ matrix.node-version == '18.x' && 'pnpm test' || 'pnpm test:coverage' }}
+
+  dependency-review:
+    name: Dependency Review
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Review dependency changes for known vulnerabilities
+        uses: actions/dependency-review-action@v4
