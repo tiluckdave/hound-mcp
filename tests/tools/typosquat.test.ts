@@ -86,6 +86,14 @@ describe("generateTypos", () => {
     expect(variants).toContain("ldoash");
   });
 
+  it("generates character doubling variants", () => {
+    const variants = generateTypos("lodash");
+
+    expect(variants).toContain("llodash");
+    expect(variants).toContain("loodash");
+    expect(variants).toContain("lodashh");
+  });
+
   it("generates hyphen and underscore variants", () => {
     expect(generateTypos("my-package")).toEqual(
       expect.arrayContaining(["my_package", "mypackage"]),

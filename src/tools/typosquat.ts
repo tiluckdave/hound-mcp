@@ -25,6 +25,7 @@ const LEET_SUBSTITUTIONS: Record<string, string[]> = {
  * Covers the most common attack patterns:
  * - character omission (lodsh)
  * - character transposition (lodasg)
+ * - character doubling (loodash, llodash)
  * - hyphen/underscore confusion (lo_dash, lo-dash)
  * - common prefix/suffix additions (node-lodash, lodash-js)
  * - character substitution / leet-speak (1odash, l0dash)
@@ -45,6 +46,11 @@ export function generateTypos(name: string): string[] {
     const a = name.charAt(i);
     const b = name.charAt(i + 1);
     variants.add(name.slice(0, i) + b + a + name.slice(i + 2));
+  }
+
+  // Double each character (gooogle, githuub, amazzon)
+  for (let i = 0; i < name.length; i++) {
+    variants.add(name.slice(0, i + 1) + name.charAt(i) + name.slice(i + 1));
   }
 
   // Hyphen/underscore confusion
