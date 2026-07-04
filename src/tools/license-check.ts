@@ -5,6 +5,7 @@ import { COPYLEFT_LICENSES, NETWORK_COPYLEFT } from "../constants/licenses.js";
 import { parseLockfile } from "../parsers/index.js";
 import type { Ecosystem } from "../types/index.js";
 import { formatUnsupportedLockfileMessage } from "../utils/lockfileFormat.js";
+import { supportedLockfilesDescription } from "../utils/lockfileFormat";
 
 // Licenses allowed under each policy
 const POLICY_ALLOWLISTS: Record<"permissive" | "copyleft", Set<string>> = {
@@ -88,7 +89,7 @@ export function register(server: McpServer) {
         lockfile_name: z
           .string()
           .describe(
-            "Filename: package-lock.json, yarn.lock, pnpm-lock.yaml, requirements.txt, poetry.lock, Cargo.lock, go.sum, Gemfile.lock, Pipfile.lock",
+            supportedLockfilesDescription()
           ),
 
         policy: z

@@ -1,3 +1,5 @@
+import { SUPPORTED_LOCKFILES } from "../constants/lockfiles";
+
 export interface ParsedDep {
   name: string;
   version: string;

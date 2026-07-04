@@ -1,3 +1,13 @@
+import { SUPPORTED_LOCKFILES } from "../constants/lockfiles";
+
+export function formatUnsupportedLockfileMessage(name: string): string {
+  return `Unsupported format: ${name}. Supported formats are: ${SUPPORTED_LOCKFILES.join(", ")}.`;
+}
+
+export function supportedLockfilesDescription(): string {
+  return `Supported lockfiles: ${SUPPORTED_LOCKFILES.join(", ")}`;
+}
+
 interface SupportedLockfile {
   filename: string;
   ecosystem: string;
