@@ -65,6 +65,23 @@ describe("hound_audit", () => {
     expect(text).toContain("GHSA-critical");
   });
 
+  it("parses bun.lock and reports clean", async () => {
+    vi.mocked(osv.queryVulnsBatch).mockResolvedValue([[]]);
+
+    const content = JSON.stringify({
+      packages: { express: ["express@4.18.2", "", {}, "sha512-abc"] },
+    });
+
+    const result = await (tool.handler as (args: Record<string, unknown>) => Promise<unknown>)({
+      lockfile_content: content,
+      lockfile_name: "bun.lock",
+    });
+
+    const text = (result as { content: { text: string }[] }).content[0]?.text ?? "";
+    expect(text).toContain("Hound Audit Report");
+    expect(text).toContain("No known vulnerabilities");
+  });
+
   it("parses gradle.lockfile and reports clean", async () => {
     vi.mocked(osv.queryVulnsBatch).mockResolvedValue([[]]);
 

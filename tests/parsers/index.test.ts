@@ -680,6 +680,113 @@ sdks:
 });
 
 // ---------------------------------------------------------------------------
+// bun.lock (Bun's text-based lockfile)
+// ---------------------------------------------------------------------------
+
+describe("bun.lock", () => {
+  it("extracts packages from the packages map", () => {
+    const content = JSON.stringify({
+      lockfileVersion: 1,
+      workspaces: { "": { name: "my-app", dependencies: { express: "^4.18.0" } } },
+      packages: {
+        express: ["express@4.18.2", "", {}, "sha512-abc"],
+        "@babel/core": ["@babel/core@7.23.0", "", {}, "sha512-def"],
+      },
+    });
+    const result = parseLockfile("bun.lock", content);
+    expect(result).toHaveLength(2);
+    expect(result).toContainEqual({ name: "express", version: "4.18.2", ecosystem: "npm" });
+    expect(result).toContainEqual({ name: "@babel/core", version: "7.23.0", ecosystem: "npm" });
+  });
+
+  it("skips workspace and git references", () => {
+    const content = JSON.stringify({
+      packages: {
+        "my-workspace-pkg": ["my-workspace-pkg@workspace:packages/pkg", "", {}],
+        express: ["express@4.18.2", "", {}, "sha512-abc"],
+        "left-pad": ["left-pad@git+https://github.com/foo/left-pad.git#abc123", "", {}],
+      },
+    });
+    const result = parseLockfile("bun.lock", content);
+    expect(result).toEqual([{ name: "express", version: "4.18.2", ecosystem: "npm" }]);
+  });
+
+  it("returns empty array for invalid JSON", () => {
+    const result = parseLockfile("bun.lock", "not valid json {{{");
+    expect(result).toEqual([]);
+  });
+
+  it("returns empty array when packages field is missing", () => {
+    const result = parseLockfile("bun.lock", JSON.stringify({ lockfileVersion: 1 }));
+    expect(result).toEqual([]);
+  });
+
+  it("skips entries that aren't arrays or whose resolution has no version", () => {
+    const content = JSON.stringify({
+      packages: {
+        express: ["express@4.18.2", "", {}, "sha512-abc"],
+        broken: "not-an-array",
+        "no-version": ["no-version", "", {}],
+        "non-string-resolution": [123, "", {}],
+      },
+    });
+    const result = parseLockfile("bun.lock", content);
+    expect(result).toEqual([{ name: "express", version: "4.18.2", ecosystem: "npm" }]);
+  });
+
+  it("derives name/version from the resolution string, not the object key", () => {
+    // Real bun.lock files key nested/transitive versions of a package by a
+    // path like "parent/child" rather than the bare package name — the true
+    // identity always lives in the resolution string itself.
+    const content = JSON.stringify({
+      packages: {
+        "ansi-styles": ["ansi-styles@4.3.0", "", {}, "sha512-abc"],
+        "chalk/ansi-styles": ["ansi-styles@6.2.1", "", {}, "sha512-def"],
+      },
+    });
+    const result = parseLockfile("bun.lock", content);
+    expect(result).toHaveLength(2);
+    expect(result).toContainEqual({ name: "ansi-styles", version: "4.3.0", ecosystem: "npm" });
+    expect(result).toContainEqual({ name: "ansi-styles", version: "6.2.1", ecosystem: "npm" });
+  });
+
+  it("de-duplicates identical name@version pairs seen under different keys", () => {
+    const content = JSON.stringify({
+      packages: {
+        "left-pad": ["left-pad@1.3.0", "", {}, "sha512-abc"],
+        "some-parent/left-pad": ["left-pad@1.3.0", "", {}, "sha512-abc"],
+      },
+    });
+    const result = parseLockfile("bun.lock", content);
+    expect(result).toEqual([{ name: "left-pad", version: "1.3.0", ecosystem: "npm" }]);
+  });
+
+  it("parses real Bun-authored JSONC with trailing commas", () => {
+    // Bun writes bun.lock as JSONC; real files commonly include trailing
+    // commas, which plain JSON.parse rejects outright.
+    const content = `{
+  "lockfileVersion": 1,
+  "workspaces": {
+    "": {
+      "name": "my-app",
+      "dependencies": {
+        "express": "^4.18.2",
+      },
+    },
+  },
+  "packages": {
+    "express": ["express@4.18.2", "", {},],
+    "@babel/core": ["@babel/core@7.23.0", "", {},],
+  },
+}`;
+    const result = parseLockfile("bun.lock", content);
+    expect(result).toHaveLength(2);
+    expect(result).toContainEqual({ name: "express", version: "4.18.2", ecosystem: "npm" });
+    expect(result).toContainEqual({ name: "@babel/core", version: "7.23.0", ecosystem: "npm" });
+  });
+});
+
+// ---------------------------------------------------------------------------
 // gradle.lockfile (Gradle/Java)
 // ---------------------------------------------------------------------------
 
