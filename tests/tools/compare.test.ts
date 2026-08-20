@@ -28,6 +28,22 @@ const mockVersion = (name: string, version: string, licenses = ["MIT"]) => ({
   links: [],
 });
 
+const mockProject = (overallScore: number, starsCount: number) => ({
+  projectKey: { id: "github.com/foo/bar" },
+  openIssuesCount: 0,
+  starsCount,
+  forksCount: 0,
+  license: "MIT",
+  description: "",
+  homepage: "",
+  scorecard: {
+    date: "2024-01-01",
+    repository: { name: "foo/bar", commit: "abc" },
+    overallScore,
+    checks: [],
+  },
+});
+
 describe("hound_compare", () => {
   let tool: ReturnType<typeof register>;
 
@@ -113,5 +129,81 @@ describe("hound_compare", () => {
 
     const text = (result as { content: { text: string }[] }).content[0]?.text ?? "";
     expect(text).toContain("Could not find either");
+  });
+
+  it("shows scorecard and star data when both packages resolve a project", async () => {
+    vi.mocked(depsdev.getPackage)
+      .mockResolvedValueOnce(mockPackage("left-pad", "1.3.0"))
+      .mockResolvedValueOnce(mockPackage("right-pad", "1.0.0"));
+    vi.mocked(depsdev.getVersion)
+      .mockResolvedValueOnce(mockVersion("left-pad", "1.3.0"))
+      .mockResolvedValueOnce(mockVersion("right-pad", "1.0.0"));
+    vi.mocked(depsdev.extractProjectId)
+      .mockReturnValueOnce("github.com/foo/left-pad")
+      .mockReturnValueOnce("github.com/foo/right-pad");
+    vi.mocked(depsdev.getProject)
+      .mockResolvedValueOnce(mockProject(8.5, 5000))
+      .mockResolvedValueOnce(mockProject(6.2, 1000));
+    vi.mocked(osv.queryVulns).mockResolvedValue([]);
+
+    const result = await (tool.handler as (args: Record<string, unknown>) => Promise<unknown>)({
+      package_a: "left-pad",
+      package_b: "right-pad",
+      ecosystem: "npm",
+    });
+
+    const text = (result as { content: { text: string }[] }).content[0]?.text ?? "";
+    expect(text).toContain("8.5");
+    expect(text).toContain("6.2");
+    expect(text).toContain("5,000");
+    expect(text).toContain("1,000");
+    expect(text).toContain("Prefer left-pad");
+  });
+
+  it("falls back to recency and license when vulnerability counts are equal", async () => {
+    vi.mocked(depsdev.getPackage)
+      .mockResolvedValueOnce(mockPackage("pkg-fresh", "2.0.0"))
+      .mockResolvedValueOnce(mockPackage("pkg-stale", "1.0.0"));
+    vi.mocked(depsdev.getVersion)
+      .mockResolvedValueOnce({
+        ...mockVersion("pkg-fresh", "2.0.0"),
+        publishedAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
+      })
+      .mockResolvedValueOnce({
+        ...mockVersion("pkg-stale", "1.0.0", ["GPL-3.0"]),
+        publishedAt: new Date(Date.now() - 400 * 24 * 60 * 60 * 1000).toISOString(),
+      });
+    vi.mocked(depsdev.extractProjectId).mockReturnValue(null);
+    vi.mocked(osv.queryVulns).mockResolvedValue([]);
+
+    const result = await (tool.handler as (args: Record<string, unknown>) => Promise<unknown>)({
+      package_a: "pkg-fresh",
+      package_b: "pkg-stale",
+      ecosystem: "npm",
+    });
+
+    const text = (result as { content: { text: string }[] }).content[0]?.text ?? "";
+    expect(text).toContain("Copyleft");
+    expect(text).toContain("Prefer pkg-fresh");
+  });
+
+  it("reports a tie when both packages are equal on every criterion", async () => {
+    vi.mocked(depsdev.getPackage)
+      .mockResolvedValueOnce(mockPackage("pkg-a", "1.0.0"))
+      .mockResolvedValueOnce(mockPackage("pkg-b", "1.0.0"));
+    vi.mocked(depsdev.getVersion)
+      .mockResolvedValueOnce(mockVersion("pkg-a", "1.0.0"))
+      .mockResolvedValueOnce(mockVersion("pkg-b", "1.0.0"));
+    vi.mocked(depsdev.extractProjectId).mockReturnValue(null);
+    vi.mocked(osv.queryVulns).mockResolvedValue([]);
+
+    const result = await (tool.handler as (args: Record<string, unknown>) => Promise<unknown>)({
+      package_a: "pkg-a",
+      package_b: "pkg-b",
+      ecosystem: "npm",
+    });
+
+    const text = (result as { content: { text: string }[] }).content[0]?.text ?? "";
+    expect(text).toContain("Both packages are roughly equivalent");
   });
 });
