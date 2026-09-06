@@ -92,6 +92,30 @@ describe("hound_preinstall", () => {
     expect(text).toContain("CAUTION");
   });
 
+  it("warns when the selected package version is over two years old", async () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2026-01-02T00:00:00.000Z"));
+    try {
+      vi.mocked(depsdev.getPackage).mockResolvedValue(mockPackage());
+      vi.mocked(depsdev.getVersion).mockResolvedValue(
+        mockVersion({ publishedAt: "2023-01-01T00:00:00.000Z" }),
+      );
+      vi.mocked(depsdev.extractProjectId).mockReturnValue(null);
+      vi.mocked(osv.queryVulns).mockResolvedValue([]);
+
+      const result = await (tool.handler as (args: Record<string, unknown>) => Promise<unknown>)({
+        name: "express",
+        ecosystem: "npm",
+      });
+
+      const text = (result as { content: { text: string }[] }).content[0]?.text ?? "";
+      expect(text).toContain("CAUTION");
+      expect(text).toContain("Package version is 3 year(s) old — may be abandoned");
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
   it("handles package not found", async () => {
     vi.mocked(depsdev.getPackage).mockRejectedValue(new Error("not found"));
 
