@@ -4,7 +4,10 @@ import { getVersion } from "../api/depsdev.js";
 import { COPYLEFT_LICENSES, NETWORK_COPYLEFT } from "../constants/licenses.js";
 import { parseLockfile } from "../parsers/index.js";
 import type { Ecosystem } from "../types/index.js";
-import { formatUnsupportedLockfileMessage } from "../utils/lockfileFormat.js";
+import {
+  formatSupportedLockfileNames,
+  formatUnsupportedLockfileMessage,
+} from "../utils/lockfileFormat.js";
 
 // Licenses allowed under each policy
 const POLICY_ALLOWLISTS: Record<"permissive" | "copyleft", Set<string>> = {
@@ -83,14 +86,7 @@ export function register(server: McpServer) {
       inputSchema: {
         lockfile_content: z.string().describe("Full text content of the lockfile"),
 
-        // pubspec.lock and composer.lock are intentionally omitted here because
-        // deps.dev does not support the Pub or Packagist ecosystems. The handler
-        // below returns an explicit message for both.
-        lockfile_name: z
-          .string()
-          .describe(
-            "Filename: package-lock.json, yarn.lock, pnpm-lock.yaml, requirements.txt, poetry.lock, Cargo.lock, go.sum, Gemfile.lock, Pipfile.lock, bun.lock, packages.lock.json, gradle.lockfile",
-          ),
+        lockfile_name: z.string().describe(`Filename: ${formatSupportedLockfileNames(true)}`),
 
         policy: z
           .enum(["permissive", "copyleft", "none"])

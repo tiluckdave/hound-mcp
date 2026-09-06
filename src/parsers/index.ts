@@ -6,29 +6,122 @@ export interface ParsedDep {
   ecosystem: "npm" | "pypi" | "cargo" | "go" | "rubygems" | "pub" | "nuget" | "packagist" | "maven";
 }
 
+export interface SupportedLockfile {
+  filename: string;
+  ecosystem: string;
+  patterns: readonly string[];
+  supportsLicenseCheck: boolean;
+  parse: (content: string) => ParsedDep[];
+}
+
+export const SUPPORTED_LOCKFILES: readonly SupportedLockfile[] = [
+  {
+    filename: "package-lock.json",
+    ecosystem: "npm",
+    patterns: ["package"],
+    supportsLicenseCheck: true,
+    parse: parsePackageLock,
+  },
+  {
+    filename: "yarn.lock",
+    ecosystem: "npm/Yarn",
+    patterns: ["yarn"],
+    supportsLicenseCheck: true,
+    parse: parseYarnLock,
+  },
+  {
+    filename: "pnpm-lock.yaml",
+    ecosystem: "npm/pnpm",
+    patterns: ["pnpm"],
+    supportsLicenseCheck: true,
+    parse: parsePnpmLock,
+  },
+  {
+    filename: "requirements.txt",
+    ecosystem: "Python/pip",
+    patterns: ["requirements", "pip"],
+    supportsLicenseCheck: true,
+    parse: parseRequirements,
+  },
+  {
+    filename: "poetry.lock",
+    ecosystem: "Python/Poetry",
+    patterns: ["poetry"],
+    supportsLicenseCheck: true,
+    parse: parsePoetryLock,
+  },
+  {
+    filename: "Cargo.lock",
+    ecosystem: "Rust/Cargo",
+    patterns: ["cargo"],
+    supportsLicenseCheck: true,
+    parse: parseCargoLock,
+  },
+  {
+    filename: "go.sum",
+    ecosystem: "Go",
+    patterns: ["go.", "gosum"],
+    supportsLicenseCheck: true,
+    parse: parseGoSum,
+  },
+  {
+    filename: "Gemfile.lock",
+    ecosystem: "Ruby/Bundler",
+    patterns: ["gemfile", "bundle", "bundler"],
+    supportsLicenseCheck: true,
+    parse: parseGemfileLock,
+  },
+  {
+    filename: "Pipfile.lock",
+    ecosystem: "Python/Pipenv",
+    patterns: ["pipfile", "pipenv"],
+    supportsLicenseCheck: true,
+    parse: parsePipfileLock,
+  },
+  {
+    filename: "pubspec.lock",
+    ecosystem: "Dart/Pub",
+    patterns: ["pubspec", "pub"],
+    supportsLicenseCheck: false,
+    parse: parsePubspecLock,
+  },
+  {
+    filename: "bun.lock",
+    ecosystem: "npm/Bun",
+    patterns: ["bun"],
+    supportsLicenseCheck: true,
+    parse: parseBunLock,
+  },
+  {
+    filename: "gradle.lockfile",
+    ecosystem: "JVM/Gradle",
+    patterns: ["gradle"],
+    supportsLicenseCheck: true,
+    parse: parseGradleLockfile,
+  },
+  {
+    filename: "packages.lock.json",
+    ecosystem: ".NET/NuGet",
+    patterns: ["packages.lock", "nuget"],
+    supportsLicenseCheck: true,
+    parse: parseNuGetLock,
+  },
+  {
+    filename: "composer.lock",
+    ecosystem: "PHP/Composer",
+    patterns: ["composer"],
+    supportsLicenseCheck: false,
+    parse: parseComposerLock,
+  },
+];
+
 /**
  * Detect lockfile type from filename and parse dependencies.
  * Returns null if the format is unrecognised.
  */
 export function parseLockfile(filename: string, content: string): ParsedDep[] | null {
   const base = filename.split("/").pop() ?? filename;
-
-  if (base === "package-lock.json") return parsePackageLock(content);
-  if (base === "yarn.lock") return parseYarnLock(content);
-  if (base === "pnpm-lock.yaml") return parsePnpmLock(content);
-  if (base === "requirements.txt") return parseRequirements(content);
-  if (base === "poetry.lock") return parsePoetryLock(content);
-  if (base === "Cargo.lock") return parseCargoLock(content);
-  if (base === "go.sum") return parseGoSum(content);
-  if (base === "Gemfile.lock") return parseGemfileLock(content);
-  if (base === "Pipfile.lock") return parsePipfileLock(content);
-  if (base === "pubspec.lock") return parsePubspecLock(content);
-  if (base === "bun.lock") return parseBunLock(content);
-  if (base === "gradle.lockfile") return parseGradleLockfile(content);
-  if (base === "packages.lock.json") return parseNuGetLock(content);
-  if (base === "composer.lock") return parseComposerLock(content);
-
-  return null;
+  return SUPPORTED_LOCKFILES.find(({ filename }) => filename === base)?.parse(content) ?? null;
 }
 
 // ---------------------------------------------------------------------------

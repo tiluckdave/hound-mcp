@@ -146,10 +146,9 @@ export function register(server: McpServer) {
 
 ## Adding a Lockfile Parser
 
-See the ["Adding a Lockfile Parser" checklist in CONTRIBUTING.md](./CONTRIBUTING.md#adding-a-lockfile-parser) — it covers `src/parsers/index.ts`, `src/constants/ecosystems.ts`, the tool descriptions in `src/tools/audit.ts` / `src/tools/license-check.ts`, and test coverage in `tests/parsers/index.test.ts`.
+See the ["Adding a Lockfile Parser" checklist in CONTRIBUTING.md](./CONTRIBUTING.md#adding-a-lockfile-parser) — it covers the `SUPPORTED_LOCKFILES` registry in `src/parsers/index.ts`, `src/constants/ecosystems.ts`, and test coverage in `tests/parsers/index.test.ts`. Tool descriptions and unsupported-format errors are generated from the registry.
 
 ---
-
 
 ## Adding a New API Client
 

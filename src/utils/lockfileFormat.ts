@@ -1,22 +1,12 @@
-interface SupportedLockfile {
-  filename: string;
-  ecosystem: string;
-  patterns: string[];
-}
+import { SUPPORTED_LOCKFILES } from "../parsers/index.js";
 
-const SUPPORTED_LOCKFILES: SupportedLockfile[] = [
-  { filename: "package-lock.json", ecosystem: "npm", patterns: ["package"] },
-  { filename: "yarn.lock", ecosystem: "npm/Yarn", patterns: ["yarn"] },
-  { filename: "pnpm-lock.yaml", ecosystem: "npm/pnpm", patterns: ["pnpm"] },
-  { filename: "requirements.txt", ecosystem: "Python/pip", patterns: ["requirements", "pip"] },
-  { filename: "Cargo.lock", ecosystem: "Rust/Cargo", patterns: ["cargo"] },
-  { filename: "go.sum", ecosystem: "Go", patterns: ["go.", "gosum"] },
-  {
-    filename: "Gemfile.lock",
-    ecosystem: "Ruby/Bundler",
-    patterns: ["gemfile", "bundle", "bundler"],
-  },
-];
+export function formatSupportedLockfileNames(licenseCheckOnly = false): string {
+  return SUPPORTED_LOCKFILES.filter(
+    ({ supportsLicenseCheck }) => !licenseCheckOnly || supportsLicenseCheck,
+  )
+    .map(({ filename }) => filename)
+    .join(", ");
+}
 
 export function suggestLockfile(input: string): string | null {
   const normalized = input.toLowerCase();

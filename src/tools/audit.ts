@@ -3,7 +3,10 @@ import { z } from "zod/v4";
 import { extractSeverity, queryVulnsBatch } from "../api/osv.js";
 import { parseLockfile } from "../parsers/index.js";
 import type { Ecosystem } from "../types/index.js";
-import { formatUnsupportedLockfileMessage } from "../utils/lockfileFormat.js";
+import {
+  formatSupportedLockfileNames,
+  formatUnsupportedLockfileMessage,
+} from "../utils/lockfileFormat.js";
 
 const MAX_BATCH = 100; // Cap to avoid huge requests
 
@@ -21,15 +24,12 @@ export function register(server: McpServer) {
   return server.registerTool(
     "hound_audit",
     {
-      description:
-        "Scan a project's lockfile for dependency risks. Parses package-lock.json, yarn.lock, pnpm-lock.yaml, requirements.txt, poetry.lock, Cargo.lock, go.sum, Gemfile.lock, pubspec.lock, Pipfile.lock, bun.lock, packages.lock.json, composer.lock, or gradle.lockfile and batch-queries OSV for vulnerabilities across all dependencies.",
+      description: `Scan a project's lockfile for dependency risks. Parses ${formatSupportedLockfileNames()} and batch-queries OSV for vulnerabilities across all dependencies.`,
       inputSchema: {
         lockfile_content: z.string().describe("Full text content of the lockfile"),
         lockfile_name: z
           .string()
-          .describe(
-            "Filename to determine format: package-lock.json, yarn.lock, pnpm-lock.yaml, requirements.txt, poetry.lock, Cargo.lock, go.sum, Gemfile.lock, pubspec.lock, Pipfile.lock, bun.lock, packages.lock.json, composer.lock, gradle.lockfile",
-          ),
+          .describe(`Filename to determine format: ${formatSupportedLockfileNames()}`),
       },
     },
     async ({ lockfile_content, lockfile_name }) => {

@@ -1,5 +1,15 @@
 import { describe, expect, it } from "vitest";
-import { parseLockfile } from "../../src/parsers/index.js";
+import { parseLockfile, SUPPORTED_LOCKFILES } from "../../src/parsers/index.js";
+
+describe("supported lockfile registry", () => {
+  it("dispatches every registered filename", () => {
+    const filenames = SUPPORTED_LOCKFILES.map(({ filename }) => filename);
+    expect(new Set(filenames).size).toBe(filenames.length);
+    for (const filename of filenames) {
+      expect(parseLockfile(filename, "")).not.toBeNull();
+    }
+  });
+});
 
 // ---------------------------------------------------------------------------
 // Fixtures — trimmed lockfile snippets

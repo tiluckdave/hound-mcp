@@ -146,6 +146,7 @@ describe("hound_audit", () => {
     const text = (result as { content: { text: string }[] }).content[0]?.text ?? "";
     expect(text).toContain("Did you mean: package-lock.json?");
     expect(text).toContain("package-lock.json (npm)");
+    expect(text).toContain("composer.lock (PHP/Composer)");
   });
 
   it("suggests pnpm-lock.yaml for a pnpm lockfile typo", async () => {

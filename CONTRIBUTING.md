@@ -101,9 +101,9 @@ export function register(server: McpServer) {
 
 Nearly every parser PR misses a step — tests, tool descriptions, or the ecosystem enum — which costs a review round-trip. Work through this checklist:
 
-1. **Write the parser** — add a `parseXxx()` function in `src/parsers/index.ts` and wire it into the `parseLockfile()` dispatcher (matched by filename, e.g. `"go.sum"`, `"Cargo.lock"`).
-2. **Register the ecosystem** — if the format introduces a new package ecosystem, add it to `ECOSYSTEM_VALUES` in `src/constants/ecosystems.ts`.
-3. **Update tool descriptions** — add the new filename to the supported-format lists in both `src/tools/audit.ts` and `src/tools/license-check.ts` (the tool `description` field and the `lockfile_name` input schema description).
+1. **Write the parser** — add a `parseXxx()` function in `src/parsers/index.ts`.
+2. **Register the format** — add its parser and metadata to `SUPPORTED_LOCKFILES` in `src/parsers/index.ts`. Tool descriptions and unsupported-format errors are generated from this registry.
+3. **Register the ecosystem** — if the format introduces a new package ecosystem, add it to `ECOSYSTEM_VALUES` in `src/constants/ecosystems.ts`.
 4. **Add tests** — add a `describe()` block for the format in `tests/parsers/index.test.ts` covering:
    - the happy path, with a realistic (trimmed) lockfile fixture parsing into the expected deps
    - invalid or malformed input returning `[]`
