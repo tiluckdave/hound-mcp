@@ -28,6 +28,25 @@ const mockVersion = (name: string, version: string, licenses = ["MIT"]) => ({
   links: [],
 });
 
+const mockProject = (id: string, scorecardScore: number | null, starsCount: number) => ({
+  projectKey: { id },
+  openIssuesCount: 0,
+  starsCount,
+  forksCount: 0,
+  license: "MIT",
+  description: "",
+  homepage: "",
+  scorecard:
+    scorecardScore === null
+      ? null
+      : {
+          date: "2026-01-01",
+          repository: { name: id, commit: "abc123" },
+          overallScore: scorecardScore,
+          checks: [],
+        },
+});
+
 describe("hound_compare", () => {
   let tool: ReturnType<typeof register>;
 
@@ -84,6 +103,74 @@ describe("hound_compare", () => {
     expect(text).toContain("Prefer pkg-b");
   });
 
+  it.each([
+    [8.7, 6.2, "pkg-a"],
+    [6.2, 8.7, "pkg-b"],
+  ])("compares OpenSSF Scorecard data (%s vs %s)", async (scoreA, scoreB, preferred) => {
+    vi.mocked(depsdev.getPackage)
+      .mockResolvedValueOnce(mockPackage("pkg-a", "1.0.0"))
+      .mockResolvedValueOnce(mockPackage("pkg-b", "1.0.0"));
+    vi.mocked(depsdev.getVersion)
+      .mockResolvedValueOnce(mockVersion("pkg-a", "1.0.0"))
+      .mockResolvedValueOnce(mockVersion("pkg-b", "1.0.0"));
+    vi.mocked(depsdev.extractProjectId)
+      .mockReturnValueOnce("github.com/example/pkg-a")
+      .mockReturnValueOnce("github.com/example/pkg-b");
+    vi.mocked(depsdev.getProject)
+      .mockResolvedValueOnce(mockProject("github.com/example/pkg-a", scoreA, 100))
+      .mockResolvedValueOnce(mockProject("github.com/example/pkg-b", scoreB, 100));
+    vi.mocked(osv.queryVulns).mockResolvedValue([]);
+
+    const result = await (tool.handler as (args: Record<string, unknown>) => Promise<unknown>)({
+      package_a: "pkg-a",
+      package_b: "pkg-b",
+      ecosystem: "npm",
+    });
+
+    const text = (result as { content: { text: string }[] }).content[0]?.text ?? "";
+    expect(text).toContain("OpenSSF Scorecard");
+    expect(text).toContain(scoreA.toFixed(1));
+    expect(text).toContain(scoreB.toFixed(1));
+    expect(text).toContain(`Prefer ${preferred} — leads on 1 of 6 criteria`);
+  });
+
+  it("uses secondary health signals when vulnerability counts are equal", async () => {
+    const staleDate = new Date(Date.now() - 90 * 24 * 60 * 60 * 1000).toISOString();
+    const recentDate = new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString();
+    vi.mocked(depsdev.getPackage)
+      .mockResolvedValueOnce(mockPackage("pkg-a", "1.0.0"))
+      .mockResolvedValueOnce(mockPackage("pkg-b", "1.0.0"));
+    vi.mocked(depsdev.getVersion)
+      .mockResolvedValueOnce({
+        ...mockVersion("pkg-a", "1.0.0", ["GPL-3.0"]),
+        publishedAt: staleDate,
+      })
+      .mockResolvedValueOnce({
+        ...mockVersion("pkg-b", "1.0.0"),
+        publishedAt: recentDate,
+      });
+    vi.mocked(depsdev.extractProjectId)
+      .mockReturnValueOnce("github.com/example/pkg-a")
+      .mockReturnValueOnce("github.com/example/pkg-b");
+    vi.mocked(depsdev.getProject)
+      .mockResolvedValueOnce(mockProject("github.com/example/pkg-a", null, 100))
+      .mockResolvedValueOnce(mockProject("github.com/example/pkg-b", null, 200));
+    vi.mocked(osv.queryVulns).mockResolvedValue([]);
+
+    const result = await (tool.handler as (args: Record<string, unknown>) => Promise<unknown>)({
+      package_a: "pkg-a",
+      package_b: "pkg-b",
+      ecosystem: "npm",
+    });
+
+    const text = (result as { content: { text: string }[] }).content[0]?.text ?? "";
+    expect(text).toMatch(/Vulnerabilities\s+None\s+None/);
+    expect(text).toContain("GitHub stars");
+    expect(text).toContain("200 ✓");
+    expect(text).toContain("License risk");
+    expect(text).toContain("Prefer pkg-b — leads on 3 of 6 criteria");
+  });
+
   it("handles package_a not found", async () => {
     vi.mocked(depsdev.getPackage)
       .mockRejectedValueOnce(new Error("not found"))
@@ -95,6 +182,24 @@ describe("hound_compare", () => {
     const result = await (tool.handler as (args: Record<string, unknown>) => Promise<unknown>)({
       package_a: "nonexistent",
       package_b: "fastify",
+      ecosystem: "npm",
+    });
+
+    const text = (result as { content: { text: string }[] }).content[0]?.text ?? "";
+    expect(text).toContain("Could not find nonexistent");
+  });
+
+  it("handles package_b not found", async () => {
+    vi.mocked(depsdev.getPackage)
+      .mockResolvedValueOnce(mockPackage("express", "4.18.2"))
+      .mockRejectedValueOnce(new Error("not found"));
+    vi.mocked(depsdev.getVersion).mockResolvedValueOnce(mockVersion("express", "4.18.2"));
+    vi.mocked(depsdev.extractProjectId).mockReturnValue(null);
+    vi.mocked(osv.queryVulns).mockResolvedValue([]);
+
+    const result = await (tool.handler as (args: Record<string, unknown>) => Promise<unknown>)({
+      package_a: "express",
+      package_b: "nonexistent",
       ecosystem: "npm",
     });
 
